@@ -1,0 +1,270 @@
+{
+  "searchAircraftResponse": {
+    "aircraft": [
+      {
+        "id": "ACF123",
+        "registration": "N123JV",
+        "model": "Gulfstream G650",
+        "manufacturer": "Gulfstream",
+        "category": "Heavy Jet",
+        "operator": {
+          "id": "OP789",
+          "name": "Elite Jets",
+          "certificate": "DOT123456"
+        },
+        "base_airport": "KTEB",
+        "current_location": "KJFK",
+        "passengers": {
+          "max": 14,
+          "typical": 12
+        },
+        "range": {
+          "nm": 7000,
+          "km": 12964
+        },
+        "speed": {
+          "cruise_mach": 0.85,
+          "max_mach": 0.925
+        },
+        "hourly_rate": 8500,
+        "minimum_hours": 2,
+        "availability": "available",
+        "amenities": [
+          "WiFi",
+          "Entertainment System",
+          "Full Galley",
+          "Lavatory",
+          "Bedroom"
+        ]
+      },
+      {
+        "id": "ACF456",
+        "registration": "N456JV",
+        "model": "Bombardier Global 7500",
+        "manufacturer": "Bombardier",
+        "category": "Heavy Jet",
+        "operator": {
+          "id": "OP789",
+          "name": "Elite Jets",
+          "certificate": "DOT123456"
+        },
+        "base_airport": "KTEB",
+        "current_location": "KTEB",
+        "passengers": {
+          "max": 19,
+          "typical": 16
+        },
+        "range": {
+          "nm": 7700,
+          "km": 14260
+        },
+        "speed": {
+          "cruise_mach": 0.85,
+          "max_mach": 0.925
+        },
+        "hourly_rate": 9500,
+        "minimum_hours": 2,
+        "availability": "available"
+      }
+    ],
+    "total_results": 2,
+    "page": 1,
+    "per_page": 25
+  },
+  "createCharterRequestResponse": {
+    "request_id": "REQ123456",
+    "status": "pending",
+    "created_at": "2024-01-15T10:00:00Z",
+    "expires_at": "2024-01-16T10:00:00Z",
+    "aircraft": {
+      "id": "ACF123",
+      "model": "Gulfstream G650",
+      "operator": "Elite Jets"
+    },
+    "itinerary": {
+      "departure": {
+        "airport": "KJFK",
+        "date": "2024-03-15",
+        "time": "10:00",
+        "timezone": "America/New_York"
+      },
+      "arrival": {
+        "airport": "KLAX",
+        "estimated_time": "13:30",
+        "timezone": "America/Los_Angeles"
+      }
+    },
+    "passengers": 8,
+    "estimated_total": 45000,
+    "currency": "USD",
+    "contact": {
+      "name": "John Doe",
+      "email": "john@jetvision.com",
+      "phone": "+1-555-0123"
+    }
+  },
+  "pricingQuoteResponse": {
+    "quote_id": "QTE123456",
+    "created_at": "2024-01-15T10:00:00Z",
+    "valid_until": "2024-01-20T23:59:59Z",
+    "aircraft": {
+      "id": "ACF123",
+      "model": "Gulfstream G650",
+      "operator": "Elite Jets"
+    },
+    "itinerary": {
+      "type": "one_way",
+      "departure": {
+        "airport": "KJFK",
+        "date": "2024-03-15"
+      },
+      "arrival": {
+        "airport": "KLAX"
+      },
+      "flight_time_hours": 5.5,
+      "distance_nm": 2475
+    },
+    "pricing": {
+      "base_cost": 46750,
+      "fuel_surcharge": 3500,
+      "landing_fees": 1200,
+      "handling_fees": 800,
+      "crew_fees": 1500,
+      "catering": 1500,
+      "subtotal": 55250,
+      "taxes": 4420,
+      "total": 59670,
+      "currency": "USD"
+    },
+    "payment_terms": {
+      "deposit_required": 11934,
+      "deposit_percentage": 20,
+      "balance_due": "24 hours before departure"
+    }
+  },
+  "roundTripPricingResponse": {
+    "quote_id": "QTE123457",
+    "created_at": "2024-01-15T10:00:00Z",
+    "valid_until": "2024-01-20T23:59:59Z",
+    "itinerary": {
+      "type": "round_trip",
+      "outbound": {
+        "departure": {
+          "airport": "KJFK",
+          "date": "2024-03-15"
+        },
+        "arrival": {
+          "airport": "KLAX"
+        },
+        "flight_time_hours": 5.5
+      },
+      "return": {
+        "departure": {
+          "airport": "KLAX",
+          "date": "2024-03-18"
+        },
+        "arrival": {
+          "airport": "KJFK"
+        },
+        "flight_time_hours": 5.0
+      },
+      "total_flight_time": 10.5
+    },
+    "pricing": {
+      "outbound_cost": 46750,
+      "return_cost": 42250,
+      "positioning_fees": 0,
+      "multi_day_fees": 6000,
+      "subtotal": 95000,
+      "taxes": 7600,
+      "total": 102600,
+      "currency": "USD"
+    }
+  },
+  "bookingConfirmationResponse": {
+    "booking_id": "BKG123456",
+    "request_id": "REQ123456",
+    "status": "confirmed",
+    "confirmed_at": "2024-01-15T11:00:00Z",
+    "payment": {
+      "method": "wire_transfer",
+      "status": "pending",
+      "deposit_amount": 11934,
+      "deposit_due": "2024-01-17T17:00:00Z",
+      "balance_amount": 47736,
+      "balance_due": "2024-03-14T10:00:00Z"
+    },
+    "aircraft": {
+      "id": "ACF123",
+      "model": "Gulfstream G650",
+      "registration": "N123JV",
+      "operator": "Elite Jets"
+    },
+    "crew": {
+      "captain": "John Smith",
+      "first_officer": "Jane Doe",
+      "attendants": 2
+    }
+  },
+  "bookingCancellationResponse": {
+    "booking_id": "BKG123456",
+    "status": "cancelled",
+    "cancelled_at": "2024-01-15T12:00:00Z",
+    "cancellation": {
+      "reason": "Client request",
+      "initiated_by": "client",
+      "cancellation_fee": 5000,
+      "refund_amount": 6934,
+      "refund_status": "processing",
+      "refund_method": "wire_transfer",
+      "estimated_refund_date": "2024-01-20"
+    }
+  },
+  "operatorInfoResponse": {
+    "operator_id": "OP789",
+    "name": "Elite Jets",
+    "legal_name": "Elite Jets LLC",
+    "certificate_number": "DOT123456",
+    "certificate_type": "Part 135",
+    "safety_ratings": {
+      "argus": "Gold",
+      "wyvern": "Wingman",
+      "is_bao": true
+    },
+    "established": 2005,
+    "headquarters": {
+      "airport": "KTEB",
+      "city": "Teterboro",
+      "state": "NJ",
+      "country": "USA"
+    },
+    "fleet": {
+      "total_aircraft": 25,
+      "categories": {
+        "heavy_jets": 10,
+        "super_midsize_jets": 8,
+        "midsize_jets": 5,
+        "light_jets": 2
+      },
+      "average_age_years": 5.5
+    },
+    "operations": {
+      "flights_per_year": 2500,
+      "hours_flown_per_year": 12000,
+      "destinations_served": 450,
+      "pilots_count": 50,
+      "maintenance_facilities": ["KTEB", "KLAS", "KPBI"]
+    },
+    "insurance": {
+      "liability_coverage": 100000000,
+      "hull_coverage": "Full replacement value",
+      "carrier": "Global Aerospace"
+    },
+    "contact": {
+      "phone": "+1-201-555-0100",
+      "email": "charter@elitejets.com",
+      "website": "https://elitejets.com",
+      "24_7_support": true
+    }
+  }
+}
