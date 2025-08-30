@@ -4,12 +4,21 @@
 
 import { createClient } from '@supabase/supabase-js';
 
-const supabaseUrl = process.env.SUPABASE_URL;
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-
-if (!supabaseUrl || !supabaseServiceKey) {
-  console.warn('Supabase credentials not found. Database-backed mock data will not be available.');
+// Function to get environment variables - works in both Node.js and Cloudflare Workers
+function getEnvVar(key: string): string | undefined {
+  // Check if we're in a Cloudflare Worker environment (global 'env' might be available)
+  if (typeof globalThis !== 'undefined' && (globalThis as any).env) {
+    return (globalThis as any).env[key];
+  }
+  // Check if we're in Node.js environment
+  if (typeof process !== 'undefined' && process.env) {
+    return process.env[key];
+  }
+  return undefined;
 }
+
+const supabaseUrl = getEnvVar('SUPABASE_URL');
+const supabaseServiceKey = getEnvVar('SUPABASE_SERVICE_ROLE_KEY');
 
 // Create Supabase client with service role key for full access
 export const supabase = supabaseUrl && supabaseServiceKey 
@@ -20,6 +29,20 @@ export const supabase = supabaseUrl && supabaseServiceKey
       }
     })
   : null;
+
+// Function to create Supabase client with environment variables (for Workers)
+export function createSupabaseClient(env: { SUPABASE_URL?: string; SUPABASE_SERVICE_ROLE_KEY?: string }) {
+  if (!env.SUPABASE_URL || !env.SUPABASE_SERVICE_ROLE_KEY) {
+    return null;
+  }
+  
+  return createClient(env.SUPABASE_URL, env.SUPABASE_SERVICE_ROLE_KEY, {
+    auth: {
+      autoRefreshToken: false,
+      persistSession: false
+    }
+  });
+}
 
 // Type definitions matching our database schema
 export interface DbAircraft {

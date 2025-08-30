@@ -11,6 +11,9 @@ export interface Env {
   NODE_ENV: string;
   LOG_LEVEL: string;
   USE_MOCK_DATA?: string;
+  USE_SUPABASE_MOCK?: string;
+  SUPABASE_URL?: string;
+  SUPABASE_SERVICE_ROLE_KEY?: string;
 }
 
 // CORS headers for all responses

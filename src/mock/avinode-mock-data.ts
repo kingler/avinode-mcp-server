@@ -637,3 +637,24 @@ export function formatCurrency(amount: number, currency: string = 'USD'): string
     maximumFractionDigits: 0
   }).format(amount);
 }
+
+export function calculateFlightTime(departureAirport: string, arrivalAirport: string): number {
+  // Simplified flight time calculation based on common routes
+  const routeTimes: Record<string, number> = {
+    'KTEB-KPBI': 2.75,
+    'KPBI-KLAX': 4.75,
+    'KLAX-KBOS': 5.5,
+    'KBOS-KTEB': 1.25,
+    'KTEB-KORD': 2.5,
+    'KORD-KDEN': 1.75,
+    'KDEN-KPHX': 1.75,
+    'KPHX-KLAS': 0.75,
+    'KLAS-KSEA': 2.5,
+    'KSEA-KSJC': 2.5
+  };
+  
+  const route = `${departureAirport}-${arrivalAirport}`;
+  const reverseRoute = `${arrivalAirport}-${departureAirport}`;
+  
+  return routeTimes[route] || routeTimes[reverseRoute] || 3.0;
+}
