@@ -1,0 +1,39 @@
+{
+  "name": "Search Aircraft",
+  "type": "n8n-nodes-base.httpRequest",
+  "position": [200, 240],
+  "parameters": {
+    "url": "http://localhost:8124/api/tools/search-aircraft",
+    "options": {
+      "redirect": {
+        "redirect": {}
+      },
+      "proxy": "",
+      "timeout": 10000,
+      "allowUnauthorizedCerts": false,
+      "queryParameters": {},
+      "headers": {
+        "Content-Type": "application/json",
+        "Accept": "application/json"
+      },
+      "useQueryString": false,
+      "splitIntoItems": false,
+      "followRedirect": true,
+      "downloadFileName": "",
+      "response": {
+        "response": {
+          "neverError": false,
+          "responseFormat": "json",
+          "outputPropertyName": "data"
+        }
+      }
+    },
+    "requestMethod": "POST",
+    "sendBody": true,
+    "specifyBody": "json",
+    "jsonBody": "{\n  \"departureAirport\": \"{{ $json.departureAirport || 'KJFK' }}\",\n  \"arrivalAirport\": \"{{ $json.arrivalAirport || 'KLAX' }}\",\n  \"departureDate\": \"{{ $json.departureDate || '2024-12-25' }}\",\n  \"passengers\": {{ $json.passengers || 6 }},\n  \"aircraftCategory\": \"{{ $json.aircraftCategory || 'Light Jet' }}\",\n  \"maxPrice\": {{ $json.maxPrice || 5000 }}\n}",
+    "bodyParameters": {},
+    "sendQuery": false,
+    "sendHeaders": false
+  }
+}

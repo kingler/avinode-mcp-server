@@ -1,7 +1,7 @@
 import { jest } from '@jest/globals';
 
 // Mock environment variables
-process.env.AVAINODE_API_KEY = 'test-api-key';
+process.env.USE_MOCK_DATA = 'true';
 process.env.NODE_ENV = 'test';
 
 // Global test timeout

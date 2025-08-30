@@ -20,7 +20,6 @@
     "test:coverage": "jest --coverage",
     "type-check": "tsc --noEmit",
     "test:watch": "jest --watch",
-    "test:coverage": "jest --coverage",
     "lint": "eslint src/**/*.ts",
     "format": "prettier --write src/**/*.ts tests/**/*.ts"
   },
@@ -30,6 +29,7 @@
   "description": "MCP server for Avainode aviation marketplace and aircraft charter platform integration",
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.17.4",
+    "@supabase/supabase-js": "^2.56.1",
     "@types/express": "^5.0.3",
     "@types/node": "^24.3.0",
     "express": "^5.1.0",

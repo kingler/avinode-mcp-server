@@ -1,0 +1,39 @@
+{
+  "name": "Get Pricing Quote",
+  "type": "n8n-nodes-base.httpRequest",
+  "position": [560, 240],
+  "parameters": {
+    "url": "http://localhost:8124/api/tools/get-pricing",
+    "options": {
+      "redirect": {
+        "redirect": {}
+      },
+      "proxy": "",
+      "timeout": 10000,
+      "allowUnauthorizedCerts": false,
+      "queryParameters": {},
+      "headers": {
+        "Content-Type": "application/json",
+        "Accept": "application/json"
+      },
+      "useQueryString": false,
+      "splitIntoItems": false,
+      "followRedirect": true,
+      "downloadFileName": "",
+      "response": {
+        "response": {
+          "neverError": false,
+          "responseFormat": "json",
+          "outputPropertyName": "data"
+        }
+      }
+    },
+    "requestMethod": "POST",
+    "sendBody": true,
+    "specifyBody": "json",
+    "jsonBody": "{\n  \"aircraftId\": \"{{ $json.aircraftId || 'ACF001' }}\",\n  \"departureAirport\": \"{{ $json.departureAirport || 'KJFK' }}\",\n  \"arrivalAirport\": \"{{ $json.arrivalAirport || 'KLAX' }}\",\n  \"departureDate\": \"{{ $json.departureDate || '2024-12-25' }}\",\n  \"departureTime\": \"{{ $json.departureTime || '10:00' }}\",\n  \"passengers\": {{ $json.passengers || 6 }},\n  \"returnDate\": \"{{ $json.returnDate || '' }}\",\n  \"includeAllFees\": {{ $json.includeAllFees || true }}\n}",
+    "bodyParameters": {},
+    "sendQuery": false,
+    "sendHeaders": false
+  }
+}

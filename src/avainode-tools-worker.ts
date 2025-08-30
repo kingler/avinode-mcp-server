@@ -28,11 +28,30 @@ export class AvainodeTools {
       case "search-aircraft":
         return await this.searchAircraft(args);
       
+      case "create-charter-request":
+        return await this.createCharterRequest(args);
+      
+      case "get-pricing":
+        return await this.getPricing(args);
+      
+      case "manage-booking":
+        return await this.manageBooking(args);
+      
+      case "get-operator-info":
+        return await this.getOperatorInfo(args);
+      
+      case "get-empty-legs":
+        return await this.getEmptyLegs(args);
+        
+      case "get-fleet-utilization":
+        return await this.getFleetUtilization(args);
+      
+      // Legacy compatibility for N8N workflows
       case "get-aircraft-availability":
         return await this.getAircraftAvailability(args);
       
       case "request-charter-quote":
-        return await this.requestCharterQuote(args);
+        return await this.getPricing(args);
       
       case "search-operators":
         return await this.searchOperators(args);
@@ -45,9 +64,6 @@ export class AvainodeTools {
       
       case "get-fuel-prices":
         return await this.getFuelPrices(args);
-      
-      case "search-empty-legs":
-        return await this.searchEmptyLegs(args);
       
       case "get-weather-briefing":
         return await this.getWeatherBriefing(args);
@@ -451,5 +467,234 @@ Fuel Required: ${flightInfo.fuelRequired}`
   Discounted Price: ${formatCurrency(l.discountedPrice)}
   Savings: ${l.savingsPercentage}%`
     ).join("\n\n");
+  }
+
+  // Core methods matching main avainode-tools.ts
+  private async createCharterRequest(args: any) {
+    const { aircraftId, departureAirport, arrivalAirport, departureDate, 
+            departureTime, passengers, contactName, contactEmail, 
+            contactPhone, company, specialRequests } = args;
+
+    if (!aircraftId || !departureAirport || !arrivalAirport || !departureDate || 
+        !departureTime || !passengers || !contactName || !contactEmail || !contactPhone) {
+      throw new Error("Missing required booking parameters");
+    }
+
+    try {
+      const response = await this.mockClient.createCharterRequest({
+        aircraftId,
+        departureAirport,
+        arrivalAirport,
+        departureDate,
+        departureTime,
+        passengers,
+        contactName,
+        contactEmail,
+        contactPhone,
+        company,
+        specialRequests
+      });
+
+      if (!response.success || !response.data) {
+        throw new Error(response.error || "Charter request failed");
+      }
+
+      const request = response.data;
+      return {
+        content: [
+          {
+            type: "text",
+            text: `# Charter Request Created Successfully
+
+## Booking Details
+- **Booking ID:** ${request.bookingId}
+- **Status:** ${request.status}
+- **Aircraft:** ${request.aircraft}
+- **Route:** ${request.route}
+- **Date:** ${request.date}
+- **Time:** ${request.time}
+- **Passengers:** ${request.passengers}
+
+## Contact Information
+- **Name:** ${request.contact.name}
+- **Email:** ${request.contact.email}
+- **Phone:** ${request.contact.phone}
+
+## Next Steps
+${request.nextSteps}
+
+*Booking reference: ${request.bookingId}*`
+          }
+        ]
+      };
+    } catch (error) {
+      return {
+        content: [
+          {
+            type: "text",
+            text: `Error creating charter request: ${error instanceof Error ? error.message : "Unknown error"}`
+          }
+        ]
+      };
+    }
+  }
+
+  private async getPricing(args: any) {
+    const { aircraftId, departureAirport, arrivalAirport, departureDate, 
+            departureTime, returnDate, returnTime, passengers, includeAllFees = true } = args;
+
+    if (!aircraftId || !departureAirport || !arrivalAirport || !departureDate || !passengers) {
+      throw new Error("Missing required pricing parameters");
+    }
+
+    try {
+      const response = await this.mockClient.getPricing({
+        aircraftId,
+        departureAirport,
+        arrivalAirport,
+        departureDate,
+        departureTime,
+        returnDate,
+        returnTime,
+        passengers,
+        includeAllFees
+      });
+
+      if (!response.success || !response.data) {
+        throw new Error(response.error || "Pricing calculation failed");
+      }
+
+      const quote = response.data;
+      return {
+        content: [
+          {
+            type: "text",
+            text: quote.formattedQuote || `Charter Flight Quote: $${quote.totalPrice} USD`
+          }
+        ]
+      };
+    } catch (error) {
+      return {
+        content: [
+          {
+            type: "text",
+            text: `Error calculating pricing: ${error instanceof Error ? error.message : "Unknown error"}`
+          }
+        ]
+      };
+    }
+  }
+
+  private async manageBooking(args: any) {
+    const { bookingId, action, paymentMethod, cancellationReason, modifications } = args;
+
+    if (!bookingId || !action) {
+      throw new Error("Missing required parameters: bookingId and action are required");
+    }
+
+    try {
+      const response = await this.mockClient.manageBooking({
+        bookingId,
+        action,
+        paymentMethod,
+        cancellationReason,
+        modifications
+      });
+
+      if (!response.success || !response.data) {
+        throw new Error(response.error || "Booking management failed");
+      }
+
+      const booking = response.data;
+      return {
+        content: [
+          {
+            type: "text",
+            text: `Booking ${action} successful: ${JSON.stringify(booking, null, 2)}`
+          }
+        ]
+      };
+    } catch (error) {
+      return {
+        content: [
+          {
+            type: "text",
+            text: `Error managing booking: ${error instanceof Error ? error.message : "Unknown error"}`
+          }
+        ]
+      };
+    }
+  }
+
+  private async getEmptyLegs(args: any) {
+    const { departureAirport, arrivalAirport, startDate, endDate, maxPrice } = args;
+
+    try {
+      const response = await this.mockClient.getEmptyLegs({
+        departureAirport,
+        arrivalAirport,
+        startDate,
+        endDate,
+        maxPrice
+      });
+
+      if (!response.success || !response.data) {
+        throw new Error(response.error || "Empty legs search failed");
+      }
+
+      const { emptyLegs, totalResults } = response.data;
+      return {
+        content: [
+          {
+            type: "text",
+            text: `Found ${totalResults} empty leg flights:\n\n${this.formatEmptyLegResults(emptyLegs.map(el => el.leg))}`
+          }
+        ]
+      };
+    } catch (error) {
+      return {
+        content: [
+          {
+            type: "text",
+            text: `Error searching empty legs: ${error instanceof Error ? error.message : "Unknown error"}`
+          }
+        ]
+      };
+    }
+  }
+
+  private async getFleetUtilization(args: any) {
+    const { operatorId = "OP001", startDate, endDate } = args;
+
+    try {
+      const response = await this.mockClient.getFleetUtilization({
+        operatorId,
+        startDate,
+        endDate
+      });
+
+      if (!response.success || !response.data) {
+        throw new Error(response.error || "Fleet utilization failed");
+      }
+
+      const data = response.data;
+      return {
+        content: [
+          {
+            type: "text",
+            text: `Fleet Utilization Report for ${data.operator.name}:\n\n${JSON.stringify(data.summary, null, 2)}`
+          }
+        ]
+      };
+    } catch (error) {
+      return {
+        content: [
+          {
+            type: "text",
+            text: `Error getting fleet utilization: ${error instanceof Error ? error.message : "Unknown error"}`
+          }
+        ]
+      };
+    }
   }
 }

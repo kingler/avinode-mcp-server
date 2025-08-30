@@ -30,45 +30,111 @@ function getTools() {
       inputSchema: {
         type: "object",
         properties: {
-          departureAirport: { type: "string", description: "ICAO or IATA code" },
-          arrivalAirport: { type: "string", description: "ICAO or IATA code" },
+          departureAirport: { type: "string", description: "ICAO airport code (e.g., KJFK)" },
+          arrivalAirport: { type: "string", description: "ICAO airport code (e.g., KLAX)" },
           departureDate: { type: "string", description: "Date in YYYY-MM-DD format" },
+          returnDate: { type: "string", description: "Return date for round trips (optional)" },
           passengers: { type: "number", description: "Number of passengers" },
-          aircraftType: { type: "string", description: "Type of aircraft (e.g., Light Jet, Heavy Jet)" },
-          maxRange: { type: "number", description: "Maximum range in nautical miles" },
-          maxPrice: { type: "number", description: "Maximum hourly rate" }
+          aircraftCategory: { type: "string", description: "Aircraft category (Light Jet, Midsize Jet, etc.)" },
+          maxPrice: { type: "number", description: "Maximum hourly rate" },
+          petFriendly: { type: "boolean", description: "Require pet-friendly aircraft" },
+          wifiRequired: { type: "boolean", description: "Require WiFi availability" }
         },
         required: ["departureAirport", "arrivalAirport", "departureDate", "passengers"]
       }
     },
     {
-      name: "get-aircraft-availability",
-      description: "Check availability of a specific aircraft",
+      name: "create-charter-request",
+      description: "Submit a charter request for a specific aircraft",
       inputSchema: {
         type: "object",
         properties: {
-          aircraftId: { type: "string" },
-          startDate: { type: "string" },
-          endDate: { type: "string" }
+          aircraftId: { type: "string", description: "Aircraft ID from search results" },
+          departureAirport: { type: "string", description: "ICAO airport code" },
+          arrivalAirport: { type: "string", description: "ICAO airport code" },
+          departureDate: { type: "string", description: "Departure date (YYYY-MM-DD)" },
+          departureTime: { type: "string", description: "Departure time (HH:MM)" },
+          passengers: { type: "number", description: "Number of passengers" },
+          contactName: { type: "string", description: "Primary contact name" },
+          contactEmail: { type: "string", description: "Contact email address" },
+          contactPhone: { type: "string", description: "Contact phone number" },
+          company: { type: "string", description: "Company name (optional)" },
+          specialRequests: { type: "string", description: "Special requirements (optional)" }
         },
-        required: ["aircraftId", "startDate", "endDate"]
+        required: ["aircraftId", "departureAirport", "arrivalAirport", "departureDate", "departureTime", "passengers", "contactName", "contactEmail", "contactPhone"]
       }
     },
     {
-      name: "request-charter-quote",
-      description: "Request a detailed charter quote",
+      name: "get-pricing",
+      description: "Generate a detailed pricing quote for a charter flight",
       inputSchema: {
         type: "object",
         properties: {
-          aircraftId: { type: "string" },
-          departureAirport: { type: "string" },
-          arrivalAirport: { type: "string" },
-          departureDate: { type: "string" },
-          returnDate: { type: "string" },
-          passengers: { type: "number" },
-          specialRequests: { type: "string" }
+          aircraftId: { type: "string", description: "Aircraft ID" },
+          departureAirport: { type: "string", description: "ICAO airport code" },
+          arrivalAirport: { type: "string", description: "ICAO airport code" },
+          departureDate: { type: "string", description: "Departure date (YYYY-MM-DD)" },
+          departureTime: { type: "string", description: "Departure time (HH:MM)" },
+          returnDate: { type: "string", description: "Return date for round trips (optional)" },
+          returnTime: { type: "string", description: "Return time (HH:MM, optional)" },
+          passengers: { type: "number", description: "Number of passengers" },
+          includeAllFees: { type: "boolean", description: "Include all fees in quote (default: true)" }
         },
         required: ["aircraftId", "departureAirport", "arrivalAirport", "departureDate", "passengers"]
+      }
+    },
+    {
+      name: "manage-booking",
+      description: "Manage existing bookings (confirm, cancel, get details, modify)",
+      inputSchema: {
+        type: "object",
+        properties: {
+          bookingId: { type: "string", description: "Booking ID" },
+          action: { type: "string", enum: ["confirm", "cancel", "get_details", "modify"], description: "Action to perform" },
+          paymentMethod: { type: "string", description: "Payment method for confirmation" },
+          cancellationReason: { type: "string", description: "Reason for cancellation" },
+          modifications: { type: "object", description: "Modifications to the booking" }
+        },
+        required: ["bookingId", "action"]
+      }
+    },
+    {
+      name: "get-operator-info",
+      description: "Retrieve detailed information about an aircraft operator",
+      inputSchema: {
+        type: "object",
+        properties: {
+          operatorId: { type: "string", description: "Operator ID" },
+          includeFleetDetails: { type: "boolean", description: "Include detailed fleet information (default: false)" },
+          includeSafetyRecords: { type: "boolean", description: "Include safety records (default: true)" }
+        },
+        required: ["operatorId"]
+      }
+    },
+    {
+      name: "get-empty-legs",
+      description: "Search for discounted empty leg flights",
+      inputSchema: {
+        type: "object",
+        properties: {
+          departureAirport: { type: "string", description: "Departure airport filter (optional)" },
+          arrivalAirport: { type: "string", description: "Arrival airport filter (optional)" },
+          startDate: { type: "string", description: "Start date for search range (optional)" },
+          endDate: { type: "string", description: "End date for search range (optional)" },
+          maxPrice: { type: "number", description: "Maximum price filter (optional)" }
+        }
+      }
+    },
+    {
+      name: "get-fleet-utilization",
+      description: "Get fleet utilization statistics and aircraft status",
+      inputSchema: {
+        type: "object",
+        properties: {
+          operatorId: { type: "string", description: "Operator ID (defaults to OP001)" },
+          startDate: { type: "string", description: "Start date for report (optional)" },
+          endDate: { type: "string", description: "End date for report (optional)" }
+        }
       }
     },
     {

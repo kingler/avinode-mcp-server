@@ -1,0 +1,278 @@
+{
+  "name": "Complete Aviation Workflow",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "24c7b5c6-cc31-4e7b-a9c0-e03e8b0a8c1c",
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [20, 240]
+    },
+    {
+      "parameters": {
+        "url": "http://localhost:8124/api/tools/search-aircraft",
+        "options": {},
+        "requestMethod": "POST",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"departureAirport\": \"KJFK\",\n  \"arrivalAirport\": \"KLAX\",\n  \"departureDate\": \"2024-12-25\",\n  \"passengers\": 6,\n  \"aircraftCategory\": \"Light Jet\",\n  \"maxPrice\": 5000\n}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Accept",
+              "value": "application/json"
+            }
+          ]
+        }
+      },
+      "id": "f8c5a2b1-3d4e-4f5a-b6c7-d8e9f0a1b2c3",
+      "name": "Search Aircraft",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [220, 240]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "leftValue": "={{ $json.success }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equal"
+              }
+            }
+          ],
+          "combinator": "and"
+        }
+      },
+      "id": "a1b2c3d4-e5f6-4a5b-6c7d-8e9f0a1b2c3d",
+      "name": "Aircraft Found?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [420, 240]
+    },
+    {
+      "parameters": {
+        "url": "http://localhost:8124/api/tools/get-pricing",
+        "options": {},
+        "requestMethod": "POST",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"aircraftId\": \"{{ $('Search Aircraft').item.json.result.content[0].text.match(/Aircraft ID:\\s*([A-Z0-9]+)/)?.[1] || 'ACF001' }}\",\n  \"departureAirport\": \"KJFK\",\n  \"arrivalAirport\": \"KLAX\",\n  \"departureDate\": \"2024-12-25\",\n  \"departureTime\": \"10:00\",\n  \"passengers\": 6,\n  \"includeAllFees\": true\n}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        }
+      },
+      "id": "b2c3d4e5-f6a7-4b5c-6d7e-8f9a0b1c2d3e",
+      "name": "Get Pricing",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [620, 140]
+    },
+    {
+      "parameters": {
+        "url": "http://localhost:8124/api/operational-data",
+        "options": {},
+        "requestMethod": "POST",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"dataType\": \"fleet-utilization\",\n  \"operatorId\": \"OP001\",\n  \"startDate\": \"2025-01-01\",\n  \"endDate\": \"2025-12-31\"\n}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        }
+      },
+      "id": "c3d4e5f6-a7b8-4c5d-6e7f-8a9b0c1d2e3f",
+      "name": "Get Fleet Status",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [620, 240]
+    },
+    {
+      "parameters": {
+        "url": "http://localhost:8124/api/tools/get-empty-legs",
+        "options": {},
+        "requestMethod": "POST",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"startDate\": \"2024-12-01\",\n  \"endDate\": \"2024-12-31\",\n  \"maxPrice\": 10000\n}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        }
+      },
+      "id": "d4e5f6a7-b8c9-4d5e-6f7a-8b9c0d1e2f3a",
+      "name": "Get Empty Legs",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [620, 340]
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "destinationFieldName": "aviation_data",
+        "options": {}
+      },
+      "id": "e5f6a7b8-c9d0-4e5f-6a7b-8c9d0e1f2a3b",
+      "name": "Combine Results",
+      "type": "n8n-nodes-base.itemLists",
+      "typeVersion": 3,
+      "position": [820, 240]
+    },
+    {
+      "parameters": {
+        "content": "# Aviation Charter Analysis Report\\n\\n## Aircraft Search Results\\n{{ $json.aviation_data[0].result.content[0].text }}\\n\\n## Pricing Quote\\n{{ $json.aviation_data[1].result.content[0].text }}\\n\\n## Fleet Utilization\\n{{ $json.aviation_data[2].result.content[0].text }}\\n\\n## Empty Leg Opportunities\\n{{ $json.aviation_data[3].result.content[0].text }}\\n\\n---\\n*Report generated on {{ $now.format('YYYY-MM-DD HH:mm:ss') }}*",
+        "options": {}
+      },
+      "id": "f6a7b8c9-d0e1-4f5a-6b7c-8d9e0f1a2b3c",
+      "name": "Generate Report",
+      "type": "n8n-nodes-base.html",
+      "typeVersion": 1,
+      "position": [1020, 240]
+    },
+    {
+      "parameters": {
+        "content": "No aircraft found matching the search criteria. Please adjust your search parameters and try again.",
+        "options": {}
+      },
+      "id": "a7b8c9d0-e1f2-4a5b-6c7d-8e9f0a1b2c3d",
+      "name": "No Results Message",
+      "type": "n8n-nodes-base.html",
+      "typeVersion": 1,
+      "position": [620, 440]
+    }
+  ],
+  "connections": {
+    "Manual Trigger": {
+      "main": [
+        [
+          {
+            "node": "Search Aircraft",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search Aircraft": {
+      "main": [
+        [
+          {
+            "node": "Aircraft Found?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aircraft Found?": {
+      "main": [
+        [
+          {
+            "node": "Get Pricing",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Get Fleet Status",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Get Empty Legs",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "No Results Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Pricing": {
+      "main": [
+        [
+          {
+            "node": "Combine Results",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Fleet Status": {
+      "main": [
+        [
+          {
+            "node": "Combine Results",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Empty Legs": {
+      "main": [
+        [
+          {
+            "node": "Combine Results",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Combine Results": {
+      "main": [
+        [
+          {
+            "node": "Generate Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2025-08-30T09:30:00.000Z",
+  "versionId": "12345678-1234-5678-9abc-123456789abc"
+}

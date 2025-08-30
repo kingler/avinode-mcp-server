@@ -39,6 +39,151 @@ app.use(express.json());
 
 const router = express.Router();
 
+// Health check endpoint
+router.get("/health", (req: Request, res: Response) => {
+  const useMockData = !process.env.AVAINODE_API_KEY || process.env.USE_MOCK_DATA === "true";
+  
+  res.json({
+    status: "healthy",
+    service: "avainode-mcp-server",
+    timestamp: new Date().toISOString(),
+    version: "1.0.0",
+    mode: useMockData ? "mock" : "production",
+    environment: process.env.NODE_ENV || "development",
+    endpoints: {
+      mcp: "/mcp",
+      health: "/health",
+      api: "/api"
+    }
+  });
+});
+
+// N8N-compatible API endpoints
+import { AvainodeTools } from "./avainode-tools";
+const avainodeTools = new AvainodeTools();
+
+// List available tools for N8N
+router.get("/api/tools", (req: Request, res: Response) => {
+  const tools = [
+    {
+      name: "search-aircraft",
+      description: "Search for available aircraft based on route and requirements",
+      parameters: ["departureAirport", "arrivalAirport", "departureDate", "passengers", "aircraftCategory", "maxPrice"]
+    },
+    {
+      name: "create-charter-request",
+      description: "Submit a charter request for a specific aircraft",
+      parameters: ["aircraftId", "departureAirport", "arrivalAirport", "departureDate", "departureTime", "passengers", "contactName", "contactEmail", "contactPhone"]
+    },
+    {
+      name: "get-pricing",
+      description: "Generate a detailed pricing quote for a charter flight",
+      parameters: ["aircraftId", "departureAirport", "arrivalAirport", "departureDate", "passengers"]
+    },
+    {
+      name: "manage-booking",
+      description: "Manage existing bookings",
+      parameters: ["bookingId", "action"]
+    },
+    {
+      name: "get-operator-info",
+      description: "Retrieve detailed information about an aircraft operator",
+      parameters: ["operatorId"]
+    },
+    {
+      name: "get-empty-legs",
+      description: "Search for discounted empty leg flights",
+      parameters: ["departureAirport", "arrivalAirport", "startDate", "endDate"]
+    },
+    {
+      name: "get-fleet-utilization",
+      description: "Get fleet utilization statistics and aircraft status",
+      parameters: ["operatorId", "startDate", "endDate"]
+    }
+  ];
+
+  res.json({
+    success: true,
+    tools: tools,
+    count: tools.length
+  });
+});
+
+// Execute tool for N8N
+router.post("/api/tools/:toolName", async (req: Request, res: Response) => {
+  const toolName = req.params.toolName;
+  const args = req.body;
+
+  try {
+    const result = await avainodeTools.handleToolCall({
+      params: {
+        name: toolName,
+        arguments: args
+      }
+    } as any);
+
+    res.json({
+      success: true,
+      tool: toolName,
+      result: result,
+      timestamp: new Date().toISOString()
+    });
+  } catch (error) {
+    console.error(`Tool execution error for ${toolName}:`, error);
+    res.status(500).json({
+      success: false,
+      error: error instanceof Error ? error.message : "Unknown error",
+      tool: toolName,
+      timestamp: new Date().toISOString()
+    });
+  }
+});
+
+// Operational data endpoint for N8N
+router.post("/api/operational-data", async (req: Request, res: Response) => {
+  try {
+    const { dataType = "fleet-utilization", ...params } = req.body;
+    
+    let result;
+    switch (dataType) {
+      case "fleet-utilization":
+        result = await avainodeTools.handleToolCall({
+          params: {
+            name: "get-fleet-utilization",
+            arguments: params
+          }
+        } as any);
+        break;
+        
+      case "empty-legs":
+        result = await avainodeTools.handleToolCall({
+          params: {
+            name: "get-empty-legs",
+            arguments: params
+          }
+        } as any);
+        break;
+        
+      default:
+        throw new Error(`Unknown data type: ${dataType}`);
+    }
+
+    res.json({
+      success: true,
+      dataType: dataType,
+      result: result,
+      timestamp: new Date().toISOString()
+    });
+  } catch (error) {
+    console.error("Operational data error:", error);
+    res.status(500).json({
+      success: false,
+      error: error instanceof Error ? error.message : "Unknown error",
+      timestamp: new Date().toISOString()
+    });
+  }
+});
+
 // single endpoint for the client to send messages to
 const MCP_ENDPOINT = "/mcp";
 

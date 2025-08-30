@@ -1,6 +1,7 @@
 /**
  * Avinode Mock API Client
  * Simulates Avinode API responses with realistic data
+ * Supports both in-memory and Supabase-backed mock data
  */
 
 import {
@@ -20,6 +21,8 @@ import {
   generateRequestId,
   formatCurrency
 } from './avinode-mock-data';
+import { AvinodeSupabaseMockClient } from './avinode-supabase-client';
+import { isSupabaseAvailable } from '../lib/supabase';
 
 export interface SearchAircraftRequest {
   departureAirport: string;
@@ -156,8 +159,20 @@ export interface GetFleetUtilizationResponse {
 export class AvinodeMockClient {
   private mockBookings: Map<string, Booking> = new Map();
   private mockQuotes: Map<string, Quote> = new Map();
+  private supabaseClient: AvinodeSupabaseMockClient | null = null;
+  private useSupabase: boolean = false;
   
-  constructor(private useMockData: boolean = true) {}
+  constructor(private useMockData: boolean = true) {
+    // Check if we should use Supabase-backed mock data
+    this.useSupabase = process.env.USE_SUPABASE_MOCK === 'true' && isSupabaseAvailable();
+    
+    if (this.useSupabase) {
+      this.supabaseClient = new AvinodeSupabaseMockClient(true);
+      console.log('Using Supabase-backed mock data');
+    } else if (process.env.USE_SUPABASE_MOCK === 'true') {
+      console.warn('Supabase mock requested but not available. Using in-memory mock data.');
+    }
+  }
 
   /**
    * Search for available aircraft
@@ -168,13 +183,35 @@ export class AvinodeMockClient {
       throw new Error('Real Avinode API not configured. Please set AVINODE_API_KEY.');
     }
 
+    // If Supabase is available, use Supabase-backed mock data
+    if (this.useSupabase && this.supabaseClient) {
+      try {
+        const supabaseResult = await this.supabaseClient.searchAircraft(request);
+        if (supabaseResult.success) {
+          return {
+            success: true,
+            data: {
+              searchId: generateRequestId(),
+              results: supabaseResult.data!.results,
+              totalResults: supabaseResult.data!.totalResults,
+              searchCriteria: request
+            }
+          };
+        } else {
+          console.warn('Supabase search failed, falling back to in-memory:', supabaseResult.error);
+        }
+      } catch (error) {
+        console.warn('Supabase search error, falling back to in-memory:', error);
+      }
+    }
+
     try {
       // Validate request
       if (!request.departureAirport || !request.arrivalAirport || !request.departureDate || !request.passengers) {
         throw new Error('Missing required search parameters');
       }
 
-      // Filter aircraft based on requirements
+      // Filter aircraft based on requirements (in-memory fallback)
       const availableAircraft = filterAircraftByRequirements(MOCK_AIRCRAFT, {
         passengers: request.passengers,
         category: request.aircraftCategory,

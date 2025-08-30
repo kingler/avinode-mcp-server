@@ -51,6 +51,18 @@ export class MCPServer {
     let transport: StreamableHTTPServerTransport;
 
     try {
+      // Add helpful error for missing Accept header on MCP initialize requests
+      if (!sessionId && this.isInitializeRequest(req.body)) {
+        const acceptHeader = req.headers.accept || req.headers.Accept;
+        if (!acceptHeader || (!acceptHeader.includes('text/event-stream') && !acceptHeader.includes('application/json'))) {
+          res.status(400).json(this.createErrorResponse(
+            "MCP Protocol Error: Missing required Accept header. Please set Accept: 'application/json, text/event-stream' for MCP protocol initialization. " +
+            "Alternative: Use REST API endpoints at /api/tools or /api/operational-data for simpler integration."
+          ));
+          return;
+        }
+      }
+
       // reuse existing transport
       if (sessionId && this.transports[sessionId]) {
         transport = this.transports[sessionId];
@@ -80,12 +92,21 @@ export class MCPServer {
       res
         .status(400)
         .json(
-          this.createErrorResponse("Bad Request: invalid session ID or method.")
+          this.createErrorResponse("Bad Request: invalid session ID or method. For N8N integration, use REST API endpoints: /api/tools or /api/operational-data")
         );
       return;
     } catch (error) {
       console.error("Error handling MCP request:", error);
-      res.status(500).json(this.createErrorResponse("Internal server error."));
+      
+      // Provide helpful error message for common MCP issues
+      if (error.message && error.message.includes('accept')) {
+        res.status(406).json(this.createErrorResponse(
+          "MCP Protocol requires Accept header: 'application/json, text/event-stream'. " +
+          "For N8N workflows, use REST endpoints: GET /api/tools, POST /api/operational-data"
+        ));
+      } else {
+        res.status(500).json(this.createErrorResponse("Internal server error: " + (error instanceof Error ? error.message : "Unknown error")));
+      }
       return;
     }
   }

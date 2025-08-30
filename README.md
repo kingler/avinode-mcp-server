@@ -18,6 +18,19 @@ npm install
 
 ## Configuration
 
+### Mock Data Mode (Recommended for Development)
+
+1. Copy the N8N environment file:
+```bash
+cp .env.n8n .env
+```
+
+2. The server will automatically use comprehensive mock data with:
+   - **In-memory mode**: Fast, resets on restart
+   - **Database mode**: Persistent data with Supabase integration
+
+### Production API Mode
+
 1. Copy `.env.example` to `.env`:
 ```bash
 cp .env.example .env
@@ -27,6 +40,24 @@ cp .env.example .env
 ```
 AVAINODE_API_KEY=your_actual_api_key_here
 ```
+
+### Supabase Integration
+
+For database-backed mock data with persistence:
+
+1. Set environment variables:
+```bash
+USE_SUPABASE_MOCK=true
+SUPABASE_URL=your_supabase_url
+SUPABASE_SERVICE_ROLE_KEY=your_service_key
+```
+
+2. Run database setup:
+```bash
+node scripts/setup-supabase.js
+```
+
+📖 **Detailed setup guide**: [docs/SUPABASE_INTEGRATION.md](docs/SUPABASE_INTEGRATION.md)
 
 ## Usage
 

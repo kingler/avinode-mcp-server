@@ -1,0 +1,200 @@
+{
+  "maintenanceFacilities": [
+    {
+      "id": "MF001",
+      "name": "JetTech Aviation Services",
+      "location": "Teterboro, New Jersey",
+      "airportCode": "KTEB",
+      "facilityType": "Full Service MRO",
+      "certifications": ["FAR Part 145", "EASA Part 145", "IS-BAO Stage III"],
+      "capabilities": ["Engine Overhaul", "Avionics Upgrade", "Structural Repair", "Paint Services", "Interior Refurbishment"],
+      "contactEmail": "maintenance@jettech-aviation.com",
+      "contactPhone": "+1-201-555-0123",
+      "operatingHours": {
+        "monday": {"open": "06:00", "close": "22:00"},
+        "tuesday": {"open": "06:00", "close": "22:00"},
+        "wednesday": {"open": "06:00", "close": "22:00"},
+        "thursday": {"open": "06:00", "close": "22:00"},
+        "friday": {"open": "06:00", "close": "22:00"},
+        "saturday": {"open": "08:00", "close": "18:00"},
+        "sunday": {"open": "08:00", "close": "18:00"}
+      },
+      "hangarCapacity": 8
+    },
+    {
+      "id": "MF002",
+      "name": "Stevens Aerospace & Defense Systems",
+      "location": "Greenville, South Carolina",
+      "airportCode": "KGMU",
+      "facilityType": "Base Maintenance",
+      "certifications": ["FAR Part 145", "FAR Part 135", "FAR Part 91K"],
+      "capabilities": ["Heavy Maintenance", "Aircraft Modifications", "Completions", "Avionics Installation"],
+      "contactEmail": "service@stevensaero.com",
+      "contactPhone": "+1-864-555-0234",
+      "operatingHours": {
+        "monday": {"open": "06:00", "close": "22:00"},
+        "tuesday": {"open": "06:00", "close": "22:00"},
+        "wednesday": {"open": "06:00", "close": "22:00"},
+        "thursday": {"open": "06:00", "close": "22:00"},
+        "friday": {"open": "06:00", "close": "22:00"},
+        "saturday": {"closed": true},
+        "sunday": {"closed": true}
+      },
+      "hangarCapacity": 12
+    }
+  ],
+  "crewMembers": [
+    {
+      "id": "CM001",
+      "employeeId": "EMP-001",
+      "firstName": "Sarah",
+      "lastName": "Mitchell",
+      "role": "Captain",
+      "status": "Available",
+      "email": "sarah.mitchell@example.com",
+      "phone": "+1-555-0101",
+      "licenses": ["ATP", "CFI", "CFII"],
+      "typeRatings": ["Citation CJ3+", "Citation Sovereign", "Hawker 400XP"],
+      "medicalCertificateExpiry": "2025-12-15",
+      "recurrentTrainingDue": "2025-06-30",
+      "totalFlightHours": 12500.5,
+      "pilotInCommandHours": 8200.0,
+      "hoursLast90Days": 180.0,
+      "hoursLast30Days": 65.0,
+      "baseAirport": "KTEB",
+      "hireDate": "2018-03-15",
+      "certifications": {
+        "type": "medical",
+        "class": "First Class",
+        "expiry": "2025-12-15"
+      },
+      "languagesSpoken": ["English", "Spanish"]
+    },
+    {
+      "id": "CM002",
+      "employeeId": "EMP-002",
+      "firstName": "Michael",
+      "lastName": "Rodriguez",
+      "role": "FirstOfficer",
+      "status": "Available",
+      "email": "michael.rodriguez@example.com",
+      "phone": "+1-555-0102",
+      "licenses": ["Commercial", "CFI", "MEI"],
+      "typeRatings": ["Citation CJ3+", "Citation XLS+"],
+      "medicalCertificateExpiry": "2025-08-20",
+      "recurrentTrainingDue": "2025-04-15",
+      "totalFlightHours": 3800.2,
+      "pilotInCommandHours": 1200.0,
+      "hoursLast90Days": 120.0,
+      "hoursLast30Days": 42.0,
+      "baseAirport": "KTEB",
+      "hireDate": "2020-11-20",
+      "certifications": {
+        "type": "medical",
+        "class": "First Class",
+        "expiry": "2025-08-20"
+      },
+      "languagesSpoken": ["English", "Portuguese"]
+    }
+  ],
+  "maintenanceSchedules": [
+    {
+      "id": "MS001",
+      "aircraftId": "ACF001",
+      "maintenanceType": "Progressive",
+      "description": "200-Hour Progressive Inspection",
+      "facilityId": "MF001",
+      "scheduledStartDate": "2025-01-15T08:00:00Z",
+      "scheduledEndDate": "2025-01-17T18:00:00Z",
+      "status": "Scheduled",
+      "estimatedCost": 15000.00,
+      "currency": "USD",
+      "priority": 2,
+      "flightHoursAtSchedule": 4250.5,
+      "flightCyclesAtSchedule": 1820,
+      "complianceReferences": ["FAR 91.409(d)"],
+      "notes": "Scheduled progressive inspection per manufacturer recommendations"
+    },
+    {
+      "id": "MS002",
+      "aircraftId": "ACF002",
+      "maintenanceType": "Routine",
+      "description": "Annual Inspection",
+      "facilityId": "MF002",
+      "scheduledStartDate": "2025-02-01T06:00:00Z",
+      "scheduledEndDate": "2025-02-05T17:00:00Z",
+      "status": "Scheduled",
+      "estimatedCost": 25000.00,
+      "currency": "USD",
+      "priority": 1,
+      "flightHoursAtSchedule": 2100.0,
+      "flightCyclesAtSchedule": 980,
+      "complianceReferences": ["FAR 91.409(a)"],
+      "notes": "Annual inspection due. Aircraft grounded until completion"
+    }
+  ],
+  "flightSchedules": [
+    {
+      "id": "FS001",
+      "flightNumber": "EXE101",
+      "aircraftId": "ACF001",
+      "departureAirport": "KTEB",
+      "arrivalAirport": "KPBI",
+      "scheduledDeparture": "2025-01-12T14:00:00Z",
+      "scheduledArrival": "2025-01-12T16:45:00Z",
+      "estimatedFlightTime": 2.75,
+      "status": "Confirmed",
+      "captainId": "CM001",
+      "firstOfficerId": "CM002",
+      "flightAttendants": [],
+      "passengerCount": 6,
+      "cargoWeight": 150.0,
+      "operationalNotes": "VIP charter flight. Catering required.",
+      "charterCustomer": "Goldman Sachs Executive",
+      "billingReference": "GS-2025-001",
+      "preFlightInspectionRequired": true,
+      "postFlightInspectionRequired": false
+    }
+  ],
+  "aircraftStatusLog": [
+    {
+      "id": "ASL001",
+      "aircraftId": "ACF001",
+      "status": "Available",
+      "previousStatus": "InService",
+      "statusChangeDate": "2025-01-11T18:30:00Z",
+      "reason": "Flight completed",
+      "location": "KTEB",
+      "currentFlightHours": 4250.5,
+      "currentFlightCycles": 1820,
+      "notes": "Aircraft returned from KPBI charter",
+      "updatedBy": "system"
+    }
+  ],
+  "crewAssignments": [
+    {
+      "id": "CA001",
+      "flightScheduleId": "FS001",
+      "crewMemberId": "CM001",
+      "role": "Captain",
+      "isPrimary": true,
+      "isBackup": false,
+      "dutyStartTime": "2025-01-12T13:00:00Z",
+      "dutyEndTime": "2025-01-12T18:00:00Z",
+      "qualifiedForAircraft": true,
+      "assignedBy": "crew_scheduler"
+    },
+    {
+      "id": "CA002",
+      "flightScheduleId": "FS001",
+      "crewMemberId": "CM002",
+      "role": "FirstOfficer",
+      "isPrimary": true,
+      "isBackup": false,
+      "dutyStartTime": "2025-01-12T13:00:00Z",
+      "dutyEndTime": "2025-01-12T18:00:00Z",
+      "qualifiedForAircraft": true,
+      "assignedBy": "crew_scheduler"
+    }
+  ]
+}

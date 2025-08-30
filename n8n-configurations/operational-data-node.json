@@ -1,0 +1,39 @@
+{
+  "name": "Get Operational Data from Avinode",
+  "type": "n8n-nodes-base.httpRequest",
+  "position": [380, 240],
+  "parameters": {
+    "url": "http://localhost:8124/api/operational-data",
+    "options": {
+      "redirect": {
+        "redirect": {}
+      },
+      "proxy": "",
+      "timeout": 10000,
+      "allowUnauthorizedCerts": false,
+      "queryParameters": {},
+      "headers": {
+        "Content-Type": "application/json",
+        "Accept": "application/json"
+      },
+      "useQueryString": false,
+      "splitIntoItems": false,
+      "followRedirect": true,
+      "downloadFileName": "",
+      "response": {
+        "response": {
+          "neverError": false,
+          "responseFormat": "json",
+          "outputPropertyName": "data"
+        }
+      }
+    },
+    "requestMethod": "POST",
+    "sendBody": true,
+    "specifyBody": "json",
+    "jsonBody": "{\n  \"dataType\": \"fleet-utilization\",\n  \"operatorId\": \"OP001\",\n  \"startDate\": \"{{ $json.startDate || '2025-01-01' }}\",\n  \"endDate\": \"{{ $json.endDate || '2025-12-31' }}\"\n}",
+    "bodyParameters": {},
+    "sendQuery": false,
+    "sendHeaders": false
+  }
+}
