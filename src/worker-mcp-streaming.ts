@@ -1,7 +1,7 @@
 /**
- * MCP Server with HTTP Streaming support for N8N
- * Implements NDJSON (newline-delimited JSON) streaming transport
- * SSE is not included as N8N has deprecated it
+ * MCP Server with HTTP Streaming Transport
+ * Implements NDJSON (newline-delimited JSON) streaming for N8N compatibility
+ * Uses HTTP streaming (not SSE) as per N8N's httpStreamable transport requirements
  */
 /// <reference types="@cloudflare/workers-types" />
 

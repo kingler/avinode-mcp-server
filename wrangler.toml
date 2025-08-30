@@ -1,5 +1,5 @@
 name = "avainode-mcp"
-main = "src/worker-mcp-sse.ts"
+main = "src/worker-mcp-streaming.ts"
 compatibility_date = "2024-01-15"
 compatibility_flags = ["nodejs_compat"]
 
