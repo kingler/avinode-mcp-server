@@ -24,6 +24,19 @@ import {
 import { AvinodeSupabaseMockClient } from './avinode-supabase-client';
 import { isSupabaseAvailable } from '../lib/supabase';
 
+// Function to get environment variables - works in both Node.js and Cloudflare Workers
+function getEnvVar(key: string): string | undefined {
+  // Check if we're in a Cloudflare Worker environment (global 'env' might be available)
+  if (typeof globalThis !== 'undefined' && (globalThis as any).env) {
+    return (globalThis as any).env[key];
+  }
+  // Check if we're in Node.js environment
+  if (typeof process !== 'undefined' && process.env) {
+    return process.env[key];
+  }
+  return undefined;
+}
+
 export interface SearchAircraftRequest {
   departureAirport: string;
   arrivalAirport: string;
@@ -164,12 +177,12 @@ export class AvinodeMockClient {
   
   constructor(private useMockData: boolean = true) {
     // Check if we should use Supabase-backed mock data
-    this.useSupabase = process.env.USE_SUPABASE_MOCK === 'true' && isSupabaseAvailable();
+    this.useSupabase = getEnvVar('USE_SUPABASE_MOCK') === 'true' && isSupabaseAvailable();
     
     if (this.useSupabase) {
       this.supabaseClient = new AvinodeSupabaseMockClient(true);
       console.log('Using Supabase-backed mock data');
-    } else if (process.env.USE_SUPABASE_MOCK === 'true') {
+    } else if (getEnvVar('USE_SUPABASE_MOCK') === 'true') {
       console.warn('Supabase mock requested but not available. Using in-memory mock data.');
     }
   }

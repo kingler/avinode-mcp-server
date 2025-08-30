@@ -37,6 +37,19 @@ import {
 import { SchedAeroSupabaseMockClient } from './schedaero-supabase-client';
 import { isSupabaseAvailable } from '../lib/supabase';
 
+// Function to get environment variables - works in both Node.js and Cloudflare Workers
+function getEnvVar(key: string): string | undefined {
+  // Check if we're in a Cloudflare Worker environment (global 'env' might be available)
+  if (typeof globalThis !== 'undefined' && (globalThis as any).env) {
+    return (globalThis as any).env[key];
+  }
+  // Check if we're in Node.js environment
+  if (typeof process !== 'undefined' && process.env) {
+    return process.env[key];
+  }
+  return undefined;
+}
+
 // ===================================
 // IN-MEMORY MOCK DATA
 // ===================================
@@ -247,7 +260,7 @@ export class SchedAeroMockClient {
 
   constructor() {
     // Check if Supabase should be used
-    const useSupabaseMock = process.env.USE_SUPABASE_MOCK === 'true';
+    const useSupabaseMock = getEnvVar('USE_SUPABASE_MOCK') === 'true';
     
     if (useSupabaseMock && isSupabaseAvailable()) {
       this.supabaseClient = new SchedAeroSupabaseMockClient();

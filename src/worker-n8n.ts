@@ -4,6 +4,13 @@
 /// <reference types="@cloudflare/workers-types" />
 
 import { AvainodeTools } from './avainode-tools-worker';
+import {
+  handleSchedAeroList,
+  handleSchedAeroOperation,
+  handlePaynodeList,
+  handlePaynodeOperation,
+  handleAllServices
+} from './api-endpoints-worker';
 
 export interface Env {
   AVAINODE_API_KEY: string;
@@ -349,17 +356,168 @@ async function handleMcpRequest(request: Request, env: Env): Promise<Response> {
   }
 }
 
-async function handleHealth(): Promise<Response> {
+async function handleHealth(env: Env): Promise<Response> {
+  const useMockData = !env.AVAINODE_API_KEY || env.USE_MOCK_DATA === 'true';
+  
   return new Response(JSON.stringify({
     status: 'healthy',
     service: 'avainode-mcp-server-n8n',
     timestamp: new Date().toISOString(),
     version: '1.0.0',
-    endpoints: getTools().length,
+    mode: useMockData ? 'mock' : 'production',
+    environment: env.NODE_ENV || 'production',
+    endpoints: {
+      mcp: '/mcp',
+      health: '/health',
+      api: '/api'
+    }
   }), {
     status: 200,
     headers: { ...corsHeaders, 'Content-Type': 'application/json' },
   });
+}
+
+async function handleApiToolsList(): Promise<Response> {
+  const tools = [
+    {
+      name: "search-aircraft",
+      description: "Search for available aircraft based on route and requirements",
+      parameters: ["departureAirport", "arrivalAirport", "departureDate", "passengers", "aircraftCategory", "maxPrice"]
+    },
+    {
+      name: "create-charter-request",
+      description: "Submit a charter request for a specific aircraft",
+      parameters: ["aircraftId", "departureAirport", "arrivalAirport", "departureDate", "departureTime", "passengers", "contactName", "contactEmail", "contactPhone"]
+    },
+    {
+      name: "get-pricing",
+      description: "Generate a detailed pricing quote for a charter flight",
+      parameters: ["aircraftId", "departureAirport", "arrivalAirport", "departureDate", "passengers"]
+    },
+    {
+      name: "manage-booking",
+      description: "Manage existing bookings",
+      parameters: ["bookingId", "action"]
+    },
+    {
+      name: "get-operator-info",
+      description: "Retrieve detailed information about an aircraft operator",
+      parameters: ["operatorId"]
+    },
+    {
+      name: "get-empty-legs",
+      description: "Search for discounted empty leg flights",
+      parameters: ["departureAirport", "arrivalAirport", "startDate", "endDate"]
+    },
+    {
+      name: "get-fleet-utilization",
+      description: "Get fleet utilization statistics and aircraft status",
+      parameters: ["operatorId", "startDate", "endDate"]
+    }
+  ];
+
+  return new Response(JSON.stringify({
+    success: true,
+    tools: tools,
+    count: tools.length
+  }), {
+    status: 200,
+    headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+  });
+}
+
+async function handleApiToolExecution(toolName: string, request: Request, env: Env): Promise<Response> {
+  try {
+    const args = await request.json();
+    
+    const avainodeTools = new AvainodeTools(
+      env.AVAINODE_API_KEY,
+      env.USE_MOCK_DATA === 'true' || !env.AVAINODE_API_KEY
+    );
+
+    const result = await avainodeTools.handleToolCall({
+      params: {
+        name: toolName,
+        arguments: args
+      }
+    } as any);
+
+    return new Response(JSON.stringify({
+      success: true,
+      tool: toolName,
+      result: result,
+      timestamp: new Date().toISOString()
+    }), {
+      status: 200,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
+  } catch (error) {
+    console.error(`Tool execution error for ${toolName}:`, error);
+    return new Response(JSON.stringify({
+      success: false,
+      error: error instanceof Error ? error.message : 'Unknown error',
+      tool: toolName,
+      timestamp: new Date().toISOString()
+    }), {
+      status: 500,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
+  }
+}
+
+async function handleOperationalData(request: Request, env: Env): Promise<Response> {
+  try {
+    const { dataType = "fleet-utilization", ...params } = await request.json();
+    
+    const avainodeTools = new AvainodeTools(
+      env.AVAINODE_API_KEY,
+      env.USE_MOCK_DATA === 'true' || !env.AVAINODE_API_KEY
+    );
+    
+    let result;
+    switch (dataType) {
+      case "fleet-utilization":
+        result = await avainodeTools.handleToolCall({
+          params: {
+            name: "get-fleet-utilization",
+            arguments: params
+          }
+        } as any);
+        break;
+        
+      case "empty-legs":
+        result = await avainodeTools.handleToolCall({
+          params: {
+            name: "get-empty-legs",
+            arguments: params
+          }
+        } as any);
+        break;
+        
+      default:
+        throw new Error(`Unknown data type: ${dataType}`);
+    }
+
+    return new Response(JSON.stringify({
+      success: true,
+      dataType: dataType,
+      result: result,
+      timestamp: new Date().toISOString()
+    }), {
+      status: 200,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
+  } catch (error) {
+    console.error("Operational data error:", error);
+    return new Response(JSON.stringify({
+      success: false,
+      error: error instanceof Error ? error.message : 'Unknown error',
+      timestamp: new Date().toISOString()
+    }), {
+      status: 500,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
+  }
 }
 
 // Export worker
@@ -384,9 +542,49 @@ export default {
     }
 
     // Route requests
+    if (path === '/health') {
+      return handleHealth(env);
+    }
+    
+    if (path === '/api/tools' && method === 'GET') {
+      return handleApiToolsList();
+    }
+    
+    if (path.startsWith('/api/tools/') && method === 'POST') {
+      const toolName = path.substring(11); // Remove '/api/tools/'
+      return handleApiToolExecution(toolName, request, env);
+    }
+    
+    if (path === '/api/operational-data' && method === 'POST') {
+      return handleOperationalData(request, env);
+    }
+    
+    // SchedAero endpoints
+    if (path === '/api/schedaero' && method === 'GET') {
+      return handleSchedAeroList();
+    }
+    
+    if (path.startsWith('/api/schedaero/') && method === 'POST') {
+      const operation = path.substring(15); // Remove '/api/schedaero/'
+      return handleSchedAeroOperation(operation, request);
+    }
+    
+    // Paynode endpoints
+    if (path === '/api/paynode' && method === 'GET') {
+      return handlePaynodeList();
+    }
+    
+    if (path.startsWith('/api/paynode/') && method === 'POST') {
+      const operation = path.substring(13); // Remove '/api/paynode/'
+      return handlePaynodeOperation(operation, request);
+    }
+    
+    // Combined services endpoint
+    if (path === '/api/services' && method === 'GET') {
+      return handleAllServices();
+    }
+
     switch (path) {
-      case '/health':
-        return handleHealth();
       
       case '/mcp':
       case '/':

@@ -60,6 +60,13 @@ router.get("/health", (req: Request, res: Response) => {
 
 // N8N-compatible API endpoints
 import { AvainodeTools } from "./avainode-tools";
+import {
+  listSchedAeroOperations,
+  executeSchedAeroOperation,
+  listPaynodeOperations,
+  executePaynodeOperation,
+  listAllServices
+} from "./api-endpoints";
 const avainodeTools = new AvainodeTools();
 
 // List available tools for N8N
@@ -138,6 +145,17 @@ router.post("/api/tools/:toolName", async (req: Request, res: Response) => {
     });
   }
 });
+
+// SchedAero API endpoints
+router.get("/api/schedaero", listSchedAeroOperations);
+router.post("/api/schedaero/:operation", executeSchedAeroOperation);
+
+// Paynode API endpoints  
+router.get("/api/paynode", listPaynodeOperations);
+router.post("/api/paynode/:operation", executePaynodeOperation);
+
+// Combined services endpoint
+router.get("/api/services", listAllServices);
 
 // Operational data endpoint for N8N
 router.post("/api/operational-data", async (req: Request, res: Response) => {
