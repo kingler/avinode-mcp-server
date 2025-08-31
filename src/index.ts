@@ -72,6 +72,7 @@ const avainodeTools = new AvainodeTools();
 // List available tools for N8N
 router.get("/api/tools", (req: Request, res: Response) => {
   const tools = [
+    // AVINODE TOOLS (7)
     {
       name: "search-aircraft",
       description: "Search for available aircraft based on route and requirements",
@@ -106,6 +107,80 @@ router.get("/api/tools", (req: Request, res: Response) => {
       name: "get-fleet-utilization",
       description: "Get fleet utilization statistics and aircraft status",
       parameters: ["operatorId", "startDate", "endDate"]
+    },
+    
+    // SCHEDAERO TOOLS (6)
+    {
+      name: "search-maintenance-facilities",
+      description: "Search for maintenance facilities",
+      parameters: ["location", "certifications", "capabilities"]
+    },
+    {
+      name: "search-crew",
+      description: "Search for available crew members",
+      parameters: ["aircraftType", "qualifications", "availability", "location"]
+    },
+    {
+      name: "create-maintenance-schedule",
+      description: "Schedule aircraft maintenance",
+      parameters: ["aircraftId", "facilityId", "maintenanceType", "scheduledDate", "estimatedHours"]
+    },
+    {
+      name: "create-flight-schedule",
+      description: "Create a flight schedule",
+      parameters: ["aircraftId", "crewIds", "departureAirport", "arrivalAirport", "departureTime", "passengers"]
+    },
+    {
+      name: "update-aircraft-status",
+      description: "Update aircraft operational status",
+      parameters: ["aircraftId", "status", "reason", "estimatedAvailability"]
+    },
+    {
+      name: "assign-crew",
+      description: "Assign crew to a flight",
+      parameters: ["flightId", "crewAssignments"]
+    },
+    
+    // PAYNODE TOOLS (8)
+    {
+      name: "create-invoice",
+      description: "Create a new invoice",
+      parameters: ["accountId", "customerAccountId", "lineItems", "dueDate", "currency"]
+    },
+    {
+      name: "process-payment",
+      description: "Process a payment",
+      parameters: ["invoiceId", "paymentMethodId", "amount", "currency"]
+    },
+    {
+      name: "create-refund",
+      description: "Create a refund for a transaction",
+      parameters: ["transactionId", "amount", "reason"]
+    },
+    {
+      name: "get-account-balance",
+      description: "Get account balance and pending transactions",
+      parameters: ["accountId"]
+    },
+    {
+      name: "get-transaction-history",
+      description: "Get transaction history for an account",
+      parameters: ["accountId", "startDate", "endDate", "transactionType"]
+    },
+    {
+      name: "add-payment-method",
+      description: "Add a new payment method",
+      parameters: ["accountId", "methodType", "methodDetails"]
+    },
+    {
+      name: "create-payout",
+      description: "Create a payout to a bank account",
+      parameters: ["accountId", "amount", "currency", "bankDetails"]
+    },
+    {
+      name: "generate-statement",
+      description: "Generate an account statement",
+      parameters: ["accountId", "startDate", "endDate", "format"]
     }
   ];
 

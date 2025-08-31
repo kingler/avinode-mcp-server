@@ -491,6 +491,335 @@ export const MOCK_EMPTY_LEGS: FlightLeg[] = [
   }
 ];
 
+export const MOCK_BOOKINGS: Booking[] = [
+  {
+    id: "BK240001",
+    quoteId: "QT53231658",
+    aircraftId: "ACF001",
+    operatorId: "OP001",
+    status: "Confirmed",
+    legs: [
+      {
+        id: "LEG-BK240001-1",
+        aircraftId: "ACF001",
+        departureAirport: "KTEB",
+        arrivalAirport: "KMIA",
+        departureDate: "2024-04-15",
+        departureTime: "09:00",
+        arrivalDate: "2024-04-15",
+        arrivalTime: "12:00",
+        flightTime: 3.0,
+        distance: 1200,
+        status: "Booked",
+        price: 31049,
+        currency: "USD",
+        type: "Charter"
+      }
+    ],
+    totalPrice: 31049,
+    currency: "USD",
+    paymentStatus: "DepositPaid",
+    paymentMethod: "CreditCard",
+    depositAmount: 15525,
+    balanceAmount: 15524,
+    depositDueDate: "2024-04-01",
+    balanceDueDate: "2024-04-14",
+    passenger: {
+      name: "James Mitchell",
+      email: "james.mitchell@techcorp.com",
+      phone: "+1-555-123-4567",
+      company: "TechCorp Solutions"
+    },
+    specialRequests: "Ground transportation to hotel, dietary restrictions - vegetarian meals",
+    createdAt: "2024-03-20T10:30:00Z",
+    updatedAt: "2024-03-25T14:15:00Z"
+  },
+  {
+    id: "BK240002",
+    quoteId: "QT53231659",
+    aircraftId: "ACF007",
+    operatorId: "OP004",
+    status: "InProgress",
+    legs: [
+      {
+        id: "LEG-BK240002-1",
+        aircraftId: "ACF007",
+        departureAirport: "KJFK",
+        arrivalAirport: "KLAX",
+        departureDate: "2024-04-20",
+        departureTime: "14:00",
+        arrivalDate: "2024-04-20",
+        arrivalTime: "19:30",
+        flightTime: 5.5,
+        distance: 2475,
+        status: "InProgress",
+        price: 69511,
+        currency: "USD",
+        type: "Charter"
+      }
+    ],
+    totalPrice: 69511,
+    currency: "USD",
+    paymentStatus: "FullyPaid",
+    paymentMethod: "BankTransfer",
+    depositAmount: 34755,
+    balanceAmount: 34756,
+    depositDueDate: "2024-04-05",
+    balanceDueDate: "2024-04-19",
+    passenger: {
+      name: "Sarah Chen",
+      email: "sarah.chen@investment.com",
+      phone: "+1-555-987-6543",
+      company: "Chen Investment Group"
+    },
+    specialRequests: "VIP catering, WiFi required for work, champagne service",
+    createdAt: "2024-03-18T16:45:00Z",
+    updatedAt: "2024-04-20T14:00:00Z"
+  },
+  {
+    id: "BK240003",
+    quoteId: "QT53231660",
+    aircraftId: "ACF005",
+    operatorId: "OP003",
+    status: "Completed",
+    legs: [
+      {
+        id: "LEG-BK240003-1",
+        aircraftId: "ACF005",
+        departureAirport: "KLAS",
+        arrivalAirport: "KORD",
+        departureDate: "2024-03-15",
+        departureTime: "08:00",
+        arrivalDate: "2024-03-15",
+        arrivalTime: "13:00",
+        flightTime: 3.0,
+        distance: 1500,
+        status: "Completed",
+        price: 35000,
+        currency: "USD",
+        type: "Charter"
+      },
+      {
+        id: "LEG-BK240003-2",
+        aircraftId: "ACF005",
+        departureAirport: "KORD",
+        arrivalAirport: "KLAS",
+        departureDate: "2024-03-17",
+        departureTime: "15:00",
+        arrivalDate: "2024-03-17",
+        arrivalTime: "17:00",
+        flightTime: 3.0,
+        distance: 1500,
+        status: "Completed",
+        price: 33250,
+        currency: "USD",
+        type: "Charter"
+      }
+    ],
+    totalPrice: 68250,
+    currency: "USD",
+    paymentStatus: "FullyPaid",
+    paymentMethod: "CreditCard",
+    depositAmount: 34125,
+    balanceAmount: 34125,
+    depositDueDate: "2024-03-01",
+    balanceDueDate: "2024-03-14",
+    passenger: {
+      name: "Michael Rodriguez",
+      email: "m.rodriguez@globalfirm.com",
+      phone: "+1-555-456-7890",
+      company: "Global Consulting Firm"
+    },
+    specialRequests: "Round trip, meeting room setup onboard, light catering",
+    createdAt: "2024-02-28T11:20:00Z",
+    updatedAt: "2024-03-17T18:00:00Z"
+  },
+  {
+    id: "BK240004",
+    quoteId: "QT53231661",
+    aircraftId: "ACF002",
+    operatorId: "OP001",
+    status: "Pending",
+    legs: [
+      {
+        id: "LEG-BK240004-1",
+        aircraftId: "ACF002",
+        departureAirport: "KBOS",
+        arrivalAirport: "KMIA",
+        departureDate: "2024-05-10",
+        departureTime: "11:00",
+        arrivalDate: "2024-05-10",
+        arrivalTime: "14:30",
+        flightTime: 3.5,
+        distance: 1300,
+        status: "Available",
+        price: 28500,
+        currency: "USD",
+        type: "Charter"
+      }
+    ],
+    totalPrice: 28500,
+    currency: "USD",
+    paymentStatus: "Pending",
+    paymentMethod: "CreditCard",
+    depositAmount: 14250,
+    balanceAmount: 14250,
+    depositDueDate: "2024-04-25",
+    balanceDueDate: "2024-05-09",
+    passenger: {
+      name: "Lisa Thompson",
+      email: "lisa.thompson@startup.io",
+      phone: "+1-555-234-5678",
+      company: "InnovateNow Startup"
+    },
+    specialRequests: "Pet-friendly flight (small dog), extra baggage allowance",
+    createdAt: "2024-04-10T09:15:00Z",
+    updatedAt: "2024-04-10T09:15:00Z"
+  },
+  {
+    id: "BK240005",
+    quoteId: "QT53231662",
+    aircraftId: "ACF010",
+    operatorId: "OP005",
+    status: "Cancelled",
+    legs: [
+      {
+        id: "LEG-BK240005-1",
+        aircraftId: "ACF010",
+        departureAirport: "KMIA",
+        arrivalAirport: "EGLL",
+        departureDate: "2024-04-25",
+        departureTime: "20:00",
+        arrivalDate: "2024-04-26",
+        arrivalTime: "10:00",
+        flightTime: 8.0,
+        distance: 4400,
+        status: "Available",
+        price: 125000,
+        currency: "USD",
+        type: "Charter"
+      }
+    ],
+    totalPrice: 125000,
+    currency: "USD",
+    paymentStatus: "Refunded",
+    paymentMethod: "BankTransfer",
+    depositAmount: 62500,
+    balanceAmount: 62500,
+    depositDueDate: "2024-04-10",
+    balanceDueDate: "2024-04-24",
+    passenger: {
+      name: "Robert Hamilton",
+      email: "robert.hamilton@luxurygroup.com",
+      phone: "+1-555-345-6789",
+      company: "Hamilton Luxury Group"
+    },
+    specialRequests: "International flight, full VIP service, private customs clearance",
+    createdAt: "2024-03-25T13:30:00Z",
+    updatedAt: "2024-04-12T10:45:00Z"
+  },
+  {
+    id: "BK240006",
+    quoteId: "QT53231663",
+    aircraftId: "ACF003",
+    operatorId: "OP002",
+    status: "Confirmed",
+    legs: [
+      {
+        id: "LEG-BK240006-1",
+        aircraftId: "ACF003",
+        departureAirport: "KPHX",
+        arrivalAirport: "KDEN",
+        departureDate: "2024-05-05",
+        departureTime: "07:30",
+        arrivalDate: "2024-05-05",
+        arrivalTime: "09:00",
+        flightTime: 1.5,
+        distance: 600,
+        status: "Booked",
+        price: 18750,
+        currency: "USD",
+        type: "Charter"
+      }
+    ],
+    totalPrice: 18750,
+    currency: "USD",
+    paymentStatus: "DepositPaid",
+    paymentMethod: "CreditCard",
+    depositAmount: 9375,
+    balanceAmount: 9375,
+    depositDueDate: "2024-04-20",
+    balanceDueDate: "2024-05-04",
+    passenger: {
+      name: "Emma Wilson",
+      email: "emma.wilson@realestate.com",
+      phone: "+1-555-567-8901",
+      company: "Premier Real Estate"
+    },
+    specialRequests: "Early morning departure, business documents to review onboard",
+    createdAt: "2024-04-15T07:00:00Z",
+    updatedAt: "2024-04-22T12:30:00Z"
+  }
+];
+
+// Customer profiles for booking data
+export const MOCK_CUSTOMERS = [
+  {
+    id: "CUST001",
+    name: "James Mitchell",
+    email: "james.mitchell@techcorp.com",
+    phone: "+1-555-123-4567",
+    company: "TechCorp Solutions",
+    type: "Corporate",
+    preferences: {
+      aircraftTypes: ["Light Jet", "Midsize Jet"],
+      amenities: ["WiFi", "Entertainment System"],
+      dietaryRestrictions: ["Vegetarian"],
+      communicationPreference: "email"
+    },
+    vipStatus: false,
+    totalBookings: 3,
+    totalSpent: 125000,
+    averageRating: 4.8
+  },
+  {
+    id: "CUST002",
+    name: "Sarah Chen", 
+    email: "sarah.chen@investment.com",
+    phone: "+1-555-987-6543",
+    company: "Chen Investment Group",
+    type: "VIP",
+    preferences: {
+      aircraftTypes: ["Heavy Jet", "Ultra Long Range"],
+      amenities: ["WiFi", "Conference Area", "Champagne Service"],
+      dietaryRestrictions: [],
+      communicationPreference: "phone"
+    },
+    vipStatus: true,
+    totalBookings: 12,
+    totalSpent: 850000,
+    averageRating: 4.9
+  },
+  {
+    id: "CUST003",
+    name: "Michael Rodriguez",
+    email: "m.rodriguez@globalfirm.com", 
+    phone: "+1-555-456-7890",
+    company: "Global Consulting Firm",
+    type: "Corporate",
+    preferences: {
+      aircraftTypes: ["Super Midsize Jet", "Heavy Jet"],
+      amenities: ["Conference Table", "Full Galley"],
+      dietaryRestrictions: [],
+      communicationPreference: "email"
+    },
+    vipStatus: false,
+    totalBookings: 7,
+    totalSpent: 320000,
+    averageRating: 4.7
+  }
+];
+
 /**
  * Mock Data Generator Functions
  */

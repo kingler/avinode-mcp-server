@@ -13,6 +13,8 @@ import {
   MOCK_AIRCRAFT,
   MOCK_OPERATORS,
   MOCK_EMPTY_LEGS,
+  MOCK_BOOKINGS,
+  MOCK_CUSTOMERS,
   generateFlightTime,
   calculatePricing,
   filterAircraftByRequirements,
@@ -175,16 +177,33 @@ export class AvinodeMockClient {
   private supabaseClient: AvinodeSupabaseMockClient | null = null;
   private useSupabase: boolean = false;
   
-  constructor(private useMockData: boolean = true) {
+  constructor(private useMockData: boolean = true, useSupabaseDirectly: boolean = false) {
     // Check if we should use Supabase-backed mock data
-    this.useSupabase = getEnvVar('USE_SUPABASE_MOCK') === 'true' && isSupabaseAvailable();
+    this.useSupabase = useSupabaseDirectly || 
+                      (getEnvVar('USE_SUPABASE_MOCK') === 'true' || 
+                       getEnvVar('USE_SUPABASE') === 'true' ||
+                       getEnvVar('AVAINODE_USE_DATABASE') === 'true') && 
+                      isSupabaseAvailable();
     
     if (this.useSupabase) {
       this.supabaseClient = new AvinodeSupabaseMockClient(true);
-      console.log('Using Supabase-backed mock data');
-    } else if (getEnvVar('USE_SUPABASE_MOCK') === 'true') {
-      console.warn('Supabase mock requested but not available. Using in-memory mock data.');
+      console.log('Using Supabase-backed aviation data');
+    } else if (getEnvVar('USE_SUPABASE') === 'true' || getEnvVar('AVAINODE_USE_DATABASE') === 'true') {
+      console.warn('Supabase requested but not available. Using in-memory mock data.');
     }
+
+    // Initialize with mock booking data
+    this.initializeMockBookings();
+  }
+
+  /**
+   * Initialize mock bookings data
+   */
+  private initializeMockBookings() {
+    MOCK_BOOKINGS.forEach(booking => {
+      this.mockBookings.set(booking.id, booking);
+    });
+    console.log(`Initialized ${MOCK_BOOKINGS.length} mock bookings`);
   }
 
   /**

@@ -353,6 +353,356 @@ export class MCPServer {
               }
             }
           }
+        },
+        
+        // SCHEDAERO TOOLS (6)
+        {
+          name: "search-maintenance-facilities",
+          description: "Search for maintenance facilities",
+          inputSchema: {
+            type: "object",
+            properties: {
+              location: { 
+                type: "string", 
+                description: "Location/airport code" 
+              },
+              certifications: { 
+                type: "string", 
+                description: "Required certifications" 
+              },
+              capabilities: { 
+                type: "string", 
+                description: "Required maintenance capabilities" 
+              }
+            }
+          }
+        },
+        {
+          name: "search-crew",
+          description: "Search for available crew members",
+          inputSchema: {
+            type: "object",
+            properties: {
+              aircraftType: { 
+                type: "string", 
+                description: "Aircraft type" 
+              },
+              qualifications: { 
+                type: "string", 
+                description: "Required qualifications" 
+              },
+              availability: { 
+                type: "string", 
+                description: "Availability date range" 
+              },
+              location: { 
+                type: "string", 
+                description: "Location/base airport" 
+              }
+            }
+          }
+        },
+        {
+          name: "create-maintenance-schedule",
+          description: "Schedule aircraft maintenance",
+          inputSchema: {
+            type: "object",
+            properties: {
+              aircraftId: { 
+                type: "string", 
+                description: "Aircraft ID" 
+              },
+              facilityId: { 
+                type: "string", 
+                description: "Maintenance facility ID" 
+              },
+              maintenanceType: { 
+                type: "string", 
+                description: "Type of maintenance" 
+              },
+              scheduledDate: { 
+                type: "string", 
+                description: "Scheduled date (YYYY-MM-DD)" 
+              },
+              estimatedHours: { 
+                type: "number", 
+                description: "Estimated maintenance hours" 
+              }
+            },
+            required: ["aircraftId", "facilityId", "maintenanceType", "scheduledDate"]
+          }
+        },
+        {
+          name: "create-flight-schedule",
+          description: "Create a flight schedule",
+          inputSchema: {
+            type: "object",
+            properties: {
+              aircraftId: { 
+                type: "string", 
+                description: "Aircraft ID" 
+              },
+              crewIds: { 
+                type: "array", 
+                description: "Array of crew member IDs" 
+              },
+              departureAirport: { 
+                type: "string", 
+                description: "ICAO departure airport code" 
+              },
+              arrivalAirport: { 
+                type: "string", 
+                description: "ICAO arrival airport code" 
+              },
+              departureTime: { 
+                type: "string", 
+                description: "Departure time (YYYY-MM-DD HH:MM)" 
+              },
+              passengers: { 
+                type: "number", 
+                description: "Number of passengers" 
+              }
+            },
+            required: ["aircraftId", "crewIds", "departureAirport", "arrivalAirport", "departureTime"]
+          }
+        },
+        {
+          name: "update-aircraft-status",
+          description: "Update aircraft operational status",
+          inputSchema: {
+            type: "object",
+            properties: {
+              aircraftId: { 
+                type: "string", 
+                description: "Aircraft ID" 
+              },
+              status: { 
+                type: "string", 
+                description: "New status (available, maintenance, in-flight, etc.)" 
+              },
+              reason: { 
+                type: "string", 
+                description: "Reason for status change" 
+              },
+              estimatedAvailability: { 
+                type: "string", 
+                description: "Estimated availability date (YYYY-MM-DD)" 
+              }
+            },
+            required: ["aircraftId", "status"]
+          }
+        },
+        {
+          name: "assign-crew",
+          description: "Assign crew to a flight",
+          inputSchema: {
+            type: "object",
+            properties: {
+              flightId: { 
+                type: "string", 
+                description: "Flight ID" 
+              },
+              crewAssignments: { 
+                type: "object", 
+                description: "Crew assignments object with roles and crew IDs" 
+              }
+            },
+            required: ["flightId", "crewAssignments"]
+          }
+        },
+        
+        // PAYNODE TOOLS (8)
+        {
+          name: "create-invoice",
+          description: "Create a new invoice",
+          inputSchema: {
+            type: "object",
+            properties: {
+              accountId: { 
+                type: "string", 
+                description: "Account ID" 
+              },
+              customerAccountId: { 
+                type: "string", 
+                description: "Customer account ID" 
+              },
+              lineItems: { 
+                type: "array", 
+                description: "Array of line items" 
+              },
+              dueDate: { 
+                type: "string", 
+                description: "Due date (YYYY-MM-DD)" 
+              },
+              currency: { 
+                type: "string", 
+                description: "Currency code (USD, EUR, etc.)" 
+              }
+            },
+            required: ["accountId", "customerAccountId", "lineItems", "currency"]
+          }
+        },
+        {
+          name: "process-payment",
+          description: "Process a payment",
+          inputSchema: {
+            type: "object",
+            properties: {
+              invoiceId: { 
+                type: "string", 
+                description: "Invoice ID" 
+              },
+              paymentMethodId: { 
+                type: "string", 
+                description: "Payment method ID" 
+              },
+              amount: { 
+                type: "number", 
+                description: "Payment amount" 
+              },
+              currency: { 
+                type: "string", 
+                description: "Currency code" 
+              }
+            },
+            required: ["invoiceId", "paymentMethodId", "amount", "currency"]
+          }
+        },
+        {
+          name: "create-refund",
+          description: "Create a refund for a transaction",
+          inputSchema: {
+            type: "object",
+            properties: {
+              transactionId: { 
+                type: "string", 
+                description: "Transaction ID" 
+              },
+              amount: { 
+                type: "number", 
+                description: "Refund amount" 
+              },
+              reason: { 
+                type: "string", 
+                description: "Reason for refund" 
+              }
+            },
+            required: ["transactionId", "amount", "reason"]
+          }
+        },
+        {
+          name: "get-account-balance",
+          description: "Get account balance and pending transactions",
+          inputSchema: {
+            type: "object",
+            properties: {
+              accountId: { 
+                type: "string", 
+                description: "Account ID" 
+              }
+            },
+            required: ["accountId"]
+          }
+        },
+        {
+          name: "get-transaction-history",
+          description: "Get transaction history for an account",
+          inputSchema: {
+            type: "object",
+            properties: {
+              accountId: { 
+                type: "string", 
+                description: "Account ID" 
+              },
+              startDate: { 
+                type: "string", 
+                description: "Start date (YYYY-MM-DD)" 
+              },
+              endDate: { 
+                type: "string", 
+                description: "End date (YYYY-MM-DD)" 
+              },
+              transactionType: { 
+                type: "string", 
+                description: "Transaction type filter" 
+              }
+            },
+            required: ["accountId"]
+          }
+        },
+        {
+          name: "add-payment-method",
+          description: "Add a new payment method",
+          inputSchema: {
+            type: "object",
+            properties: {
+              accountId: { 
+                type: "string", 
+                description: "Account ID" 
+              },
+              methodType: { 
+                type: "string", 
+                description: "Payment method type (card, bank, etc.)" 
+              },
+              methodDetails: { 
+                type: "object", 
+                description: "Payment method details" 
+              }
+            },
+            required: ["accountId", "methodType", "methodDetails"]
+          }
+        },
+        {
+          name: "create-payout",
+          description: "Create a payout to a bank account",
+          inputSchema: {
+            type: "object",
+            properties: {
+              accountId: { 
+                type: "string", 
+                description: "Account ID" 
+              },
+              amount: { 
+                type: "number", 
+                description: "Payout amount" 
+              },
+              currency: { 
+                type: "string", 
+                description: "Currency code" 
+              },
+              bankDetails: { 
+                type: "object", 
+                description: "Bank account details" 
+              }
+            },
+            required: ["accountId", "amount", "currency", "bankDetails"]
+          }
+        },
+        {
+          name: "generate-statement",
+          description: "Generate an account statement",
+          inputSchema: {
+            type: "object",
+            properties: {
+              accountId: { 
+                type: "string", 
+                description: "Account ID" 
+              },
+              startDate: { 
+                type: "string", 
+                description: "Start date (YYYY-MM-DD)" 
+              },
+              endDate: { 
+                type: "string", 
+                description: "End date (YYYY-MM-DD)" 
+              },
+              format: { 
+                type: "string", 
+                description: "Statement format (PDF, CSV, etc.)" 
+              }
+            },
+            required: ["accountId", "startDate", "endDate"]
+          }
         }
       ];
 
