@@ -15,7 +15,8 @@ workers_dev = true
 NODE_ENV = "production"
 LOG_LEVEL = "info"
 MCP_VERSION = "1.0.0"
-USE_SUPABASE_MOCK = "true"
+USE_SUPABASE = "true"
+USE_SUPABASE_MOCK = "false"
 
 # Supabase secrets (set via: npx wrangler secret put SUPABASE_URL, etc.)
 # Required for Supabase-backed mock data:
@@ -56,6 +57,13 @@ route = { pattern = "avainode-mcp-staging.designthru.ai/*", zone_name = "designt
 [env.staging.vars]
 NODE_ENV = "staging"
 LOG_LEVEL = "debug"
+MCP_VERSION = "1.0.0"
+USE_SUPABASE = "true"
+USE_SUPABASE_MOCK = "false"
+
+[[env.staging.kv_namespaces]]
+binding = "SESSIONS"
+id = "8bba59126986471abc0b226d12400ba6"
 
 [env.production]
 name = "avainode-mcp"
@@ -65,8 +73,8 @@ route = { pattern = "avainode-mcp.designthru.ai/*", zone_name = "designthru.ai" 
 NODE_ENV = "production"
 LOG_LEVEL = "warn"
 MCP_VERSION = "1.0.0"
-USE_MOCK_DATA = "true"
-USE_SUPABASE_MOCK = "true"
+USE_SUPABASE = "true"
+USE_SUPABASE_MOCK = "false"
 
 [[env.production.kv_namespaces]]
 binding = "SESSIONS"

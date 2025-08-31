@@ -188,6 +188,226 @@ router.post('/mcp/tools/list', async (request: Request, env: Env) => {
         required: ['operatorId'],
       },
     },
+    {
+      name: 'get-empty-legs',
+      description: 'Search for discounted empty leg flights (repositioning flights)',
+      inputSchema: {
+        type: 'object',
+        properties: {
+          departureAirport: { type: 'string' },
+          arrivalAirport: { type: 'string' },
+          startDate: { type: 'string' },
+          endDate: { type: 'string' },
+          maxPrice: { type: 'number' },
+        },
+      },
+    },
+    {
+      name: 'get-fleet-utilization',
+      description: 'Get fleet utilization statistics and aircraft status for an operator',
+      inputSchema: {
+        type: 'object',
+        properties: {
+          operatorId: { type: 'string' },
+          startDate: { type: 'string' },
+          endDate: { type: 'string' },
+        },
+      },
+    },
+    
+    // SCHEDAERO TOOLS (6)
+    {
+      name: 'search-maintenance-facilities',
+      description: 'Search for maintenance facilities',
+      inputSchema: {
+        type: 'object',
+        properties: {
+          location: { type: 'string' },
+          certifications: { type: 'string' },
+          capabilities: { type: 'string' },
+        },
+      },
+    },
+    {
+      name: 'search-crew',
+      description: 'Search for available crew members',
+      inputSchema: {
+        type: 'object',
+        properties: {
+          aircraftType: { type: 'string' },
+          qualifications: { type: 'string' },
+          availability: { type: 'string' },
+          location: { type: 'string' },
+        },
+      },
+    },
+    {
+      name: 'create-maintenance-schedule',
+      description: 'Schedule aircraft maintenance',
+      inputSchema: {
+        type: 'object',
+        properties: {
+          aircraftId: { type: 'string' },
+          facilityId: { type: 'string' },
+          maintenanceType: { type: 'string' },
+          scheduledDate: { type: 'string' },
+          estimatedHours: { type: 'number' },
+        },
+        required: ['aircraftId', 'facilityId', 'maintenanceType', 'scheduledDate'],
+      },
+    },
+    {
+      name: 'create-flight-schedule',
+      description: 'Create a flight schedule',
+      inputSchema: {
+        type: 'object',
+        properties: {
+          aircraftId: { type: 'string' },
+          crewIds: { type: 'array' },
+          departureAirport: { type: 'string' },
+          arrivalAirport: { type: 'string' },
+          departureTime: { type: 'string' },
+          passengers: { type: 'number' },
+        },
+        required: ['aircraftId', 'crewIds', 'departureAirport', 'arrivalAirport', 'departureTime'],
+      },
+    },
+    {
+      name: 'update-aircraft-status',
+      description: 'Update aircraft operational status',
+      inputSchema: {
+        type: 'object',
+        properties: {
+          aircraftId: { type: 'string' },
+          status: { type: 'string' },
+          reason: { type: 'string' },
+          estimatedAvailability: { type: 'string' },
+        },
+        required: ['aircraftId', 'status'],
+      },
+    },
+    {
+      name: 'assign-crew',
+      description: 'Assign crew to a flight',
+      inputSchema: {
+        type: 'object',
+        properties: {
+          flightId: { type: 'string' },
+          crewAssignments: { type: 'object' },
+        },
+        required: ['flightId', 'crewAssignments'],
+      },
+    },
+    
+    // PAYNODE TOOLS (8)
+    {
+      name: 'create-invoice',
+      description: 'Create a new invoice',
+      inputSchema: {
+        type: 'object',
+        properties: {
+          accountId: { type: 'string' },
+          customerAccountId: { type: 'string' },
+          lineItems: { type: 'array' },
+          dueDate: { type: 'string' },
+          currency: { type: 'string' },
+        },
+        required: ['accountId', 'customerAccountId', 'lineItems', 'currency'],
+      },
+    },
+    {
+      name: 'process-payment',
+      description: 'Process a payment',
+      inputSchema: {
+        type: 'object',
+        properties: {
+          invoiceId: { type: 'string' },
+          paymentMethodId: { type: 'string' },
+          amount: { type: 'number' },
+          currency: { type: 'string' },
+        },
+        required: ['invoiceId', 'paymentMethodId', 'amount', 'currency'],
+      },
+    },
+    {
+      name: 'create-refund',
+      description: 'Create a refund for a transaction',
+      inputSchema: {
+        type: 'object',
+        properties: {
+          transactionId: { type: 'string' },
+          amount: { type: 'number' },
+          reason: { type: 'string' },
+        },
+        required: ['transactionId', 'amount', 'reason'],
+      },
+    },
+    {
+      name: 'get-account-balance',
+      description: 'Get account balance and pending transactions',
+      inputSchema: {
+        type: 'object',
+        properties: {
+          accountId: { type: 'string' },
+        },
+        required: ['accountId'],
+      },
+    },
+    {
+      name: 'get-transaction-history',
+      description: 'Get transaction history for an account',
+      inputSchema: {
+        type: 'object',
+        properties: {
+          accountId: { type: 'string' },
+          startDate: { type: 'string' },
+          endDate: { type: 'string' },
+          transactionType: { type: 'string' },
+        },
+        required: ['accountId'],
+      },
+    },
+    {
+      name: 'add-payment-method',
+      description: 'Add a new payment method',
+      inputSchema: {
+        type: 'object',
+        properties: {
+          accountId: { type: 'string' },
+          methodType: { type: 'string' },
+          methodDetails: { type: 'object' },
+        },
+        required: ['accountId', 'methodType', 'methodDetails'],
+      },
+    },
+    {
+      name: 'create-payout',
+      description: 'Create a payout to a bank account',
+      inputSchema: {
+        type: 'object',
+        properties: {
+          accountId: { type: 'string' },
+          amount: { type: 'number' },
+          currency: { type: 'string' },
+          bankDetails: { type: 'object' },
+        },
+        required: ['accountId', 'amount', 'currency', 'bankDetails'],
+      },
+    },
+    {
+      name: 'generate-statement',
+      description: 'Generate an account statement',
+      inputSchema: {
+        type: 'object',
+        properties: {
+          accountId: { type: 'string' },
+          startDate: { type: 'string' },
+          endDate: { type: 'string' },
+          format: { type: 'string' },
+        },
+        required: ['accountId', 'startDate', 'endDate'],
+      },
+    },
   ];
 
   const body = await request.json() as any;
