@@ -3,7 +3,7 @@
  */
 /// <reference types="@cloudflare/workers-types" />
 
-import { AvainodeTools } from './avainode-tools-worker';
+import { AvainodeTools } from './avainode-tools';
 import {
   handleSchedAeroList,
   handleSchedAeroOperation,
@@ -467,7 +467,8 @@ async function handleApiToolExecution(toolName: string, request: Request, env: E
 
 async function handleOperationalData(request: Request, env: Env): Promise<Response> {
   try {
-    const { dataType = "fleet-utilization", ...params } = await request.json();
+    const requestData = await request.json() as any;
+    const { dataType = "fleet-utilization", ...params } = requestData;
     
     const avainodeTools = new AvainodeTools(
       env.AVAINODE_API_KEY,
@@ -595,7 +596,7 @@ export default {
         
       case '/mcp/initialize':
         if (method === 'POST') {
-          const body = await request.json();
+          const body = await request.json() as any;
           const newRequest = new Request(request.url.replace('/mcp/initialize', '/mcp'), {
             method: 'POST',
             headers: request.headers,
@@ -607,7 +608,7 @@ export default {
         
       case '/mcp/tools/list':
         if (method === 'POST') {
-          const body = await request.json();
+          const body = await request.json() as any;
           const newRequest = new Request(request.url.replace('/mcp/tools/list', '/mcp'), {
             method: 'POST',
             headers: request.headers,
@@ -619,7 +620,7 @@ export default {
         
       case '/mcp/tools/call':
         if (method === 'POST') {
-          const body = await request.json();
+          const body = await request.json() as any;
           const newRequest = new Request(request.url.replace('/mcp/tools/call', '/mcp'), {
             method: 'POST',
             headers: request.headers,

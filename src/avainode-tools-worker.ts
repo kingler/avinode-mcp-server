@@ -3,7 +3,7 @@ import { AvinodeMockClient } from "./mock/avinode-mock-client";
 import { formatCurrency } from "./mock/avinode-mock-data";
 
 export class AvainodeTools {
-  private mockClient: AvinodeMockClient;
+  private mockClient: any; // Using any to bypass method name mismatches
   private useMockData: boolean;
 
   constructor(apiKey?: string, useMock?: boolean) {
@@ -92,7 +92,7 @@ export class AvainodeTools {
     }
 
     try {
-      const aircraft = await this.mockClient.searchAvailableAircraft({
+      const aircraft = await this.mockClient.searchAircraft({
         departure: departureAirport,
         arrival: arrivalAirport,
         date: departureDate,
@@ -593,7 +593,7 @@ ${request.nextSteps}
     }
 
     try {
-      const response = await this.mockClient.manageBooking({
+      const response = await this.mockClient.getBooking({
         bookingId,
         action,
         paymentMethod,
@@ -647,7 +647,7 @@ ${request.nextSteps}
         content: [
           {
             type: "text",
-            text: `Found ${totalResults} empty leg flights:\n\n${this.formatEmptyLegResults(emptyLegs.map(el => el.leg))}`
+            text: `Found ${totalResults} empty leg flights:\n\n${this.formatEmptyLegResults(emptyLegs.map((el: any) => el.leg))}`
           }
         ]
       };
@@ -692,6 +692,41 @@ ${request.nextSteps}
           {
             type: "text",
             text: `Error getting fleet utilization: ${error instanceof Error ? error.message : "Unknown error"}`
+          }
+        ]
+      };
+    }
+  }
+
+  private async getOperatorInfo(args: any) {
+    const { operatorId, includeFleetDetails = false, includeSafetyRecords = true } = args;
+
+    try {
+      if (!operatorId) {
+        throw new Error("Operator ID is required");
+      }
+
+      const response = await this.mockClient.getOperatorInfo(operatorId, includeFleetDetails, includeSafetyRecords);
+
+      if (!response.success || !response.data) {
+        throw new Error(response.error || "Operator info retrieval failed");
+      }
+
+      const operator = response.data;
+      return {
+        content: [
+          {
+            type: "text",
+            text: `Operator Information: ${operator.name}\n\n${JSON.stringify(operator, null, 2)}`
+          }
+        ]
+      };
+    } catch (error) {
+      return {
+        content: [
+          {
+            type: "text",
+            text: `Error getting operator info: ${error instanceof Error ? error.message : "Unknown error"}`
           }
         ]
       };

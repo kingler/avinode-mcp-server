@@ -21,7 +21,15 @@
     "type-check": "tsc --noEmit",
     "test:watch": "jest --watch",
     "lint": "eslint src/**/*.ts",
-    "format": "prettier --write src/**/*.ts tests/**/*.ts"
+    "format": "prettier --write src/**/*.ts tests/**/*.ts",
+    "migrate": "ts-node scripts/run-migrations.ts",
+    "create:tables": "ts-node scripts/create-tables-direct.ts",
+    "test:db": "ts-node scripts/test-database.ts",
+    "seed:opensky": "ts-node scripts/seed-opensky-data.ts",
+    "seed:opensky:dev": "ts-node --files scripts/seed-opensky-data.ts",
+    "enhance:images": "ts-node scripts/enhance-aircraft-images.ts",
+    "seed:existing": "ts-node scripts/seed-existing-schema.ts",
+    "enhance:existing": "ts-node scripts/enhance-existing-images.ts"
   },
   "keywords": [],
   "author": "",
@@ -29,11 +37,14 @@
   "description": "MCP server for Avainode aviation marketplace and aircraft charter platform integration",
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.17.4",
+    "@prisma/client": "^6.15.0",
     "@supabase/supabase-js": "^2.56.1",
     "@types/express": "^5.0.3",
     "@types/node": "^24.3.0",
+    "dotenv": "^17.2.1",
     "express": "^5.1.0",
     "itty-router": "^5.0.22",
+    "prisma": "^6.15.0",
     "typescript": "^5.9.2"
   },
   "devDependencies": {

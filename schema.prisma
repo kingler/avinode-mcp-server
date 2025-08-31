@@ -1,0 +1,642 @@
+// NextAvinode Competitive Platform - Prisma Schema
+// Comprehensive aviation marketplace with AI, blockchain, and real-time features
+
+generator client {
+  provider = "prisma-client-js"
+  binaryTargets = ["native", "debian-openssl-1.1.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ===================================
+// CORE AVIATION ENTITIES
+// ===================================
+
+model Operator {
+  id                String   @id
+  name              String
+  certificate       String
+  established       Int
+  headquarters       String
+  operatingBases     String[]
+  fleetSize         Int      @default(0)
+  safetyRating      String
+  insurance         String
+  certifications    String[]
+  contactEmail      String
+  contactPhone      String
+  website           String?
+  description       String?
+  
+  // Enhanced fields for competitive advantage
+  avgRating         Float?   @default(0)
+  totalReviews      Int      @default(0)
+  responseTimeHours Int      @default(24)
+  instantBookingEnabled Boolean @default(false)
+  
+  // AI/ML enhancement fields
+  aiOptimizedPricing Boolean @default(false)
+  predictiveMaintenanceEnabled Boolean @default(false)
+  smartRoutingEnabled Boolean @default(false)
+  
+  // Blockchain verification
+  blockchainVerified Boolean @default(false)
+  blockchainAddress String?
+  
+  // Sustainability metrics
+  carbonOffsetProgram Boolean @default(false)
+  safPercentage      Float?  @default(0)
+  
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  // Relations
+  aircraft          Aircraft[]
+  charterRequests   CharterRequest[]
+  bookings          Booking[]
+  operatorReviews   OperatorReview[]
+  
+  @@map("operators")
+}
+
+model Aircraft {
+  id                String   @id
+  registrationNumber String  @unique
+  model             String
+  manufacturer      String
+  category          String
+  subcategory       String
+  yearOfManufacture Int
+  maxPassengers     Int
+  cruiseSpeed       Int      // knots
+  range             Int      // nautical miles
+  hourlyRate        Decimal  @db.Decimal(10,2)
+  operatorId        String
+  operatorName      String   // Denormalized for performance
+  baseAirport       String   // ICAO code
+  availability      AvailabilityStatus @default(Available)
+  amenities         String[]
+  images            String[]
+  certifications    String[]
+  wifiAvailable     Boolean  @default(false)
+  petFriendly       Boolean  @default(false)
+  smokingAllowed    Boolean  @default(false)
+  
+  // Enhanced competitive features
+  avgRating         Float?   @default(0)
+  totalFlights      Int      @default(0)
+  lastMaintenanceDate DateTime?
+  nextMaintenanceDate DateTime?
+  
+  // AI-powered features
+  predictedAvailability Json? // AI-generated availability predictions
+  dynamicPricingEnabled Boolean @default(false)
+  currentDynamicRate Decimal? @db.Decimal(10,2)
+  
+  // IoT integration
+  realTimeLocation  Json?    // Current GPS coordinates
+  fuelLevel         Float?   // Current fuel percentage
+  maintenanceStatus Json?    // Real-time maintenance data
+  
+  // Sustainability
+  fuelEfficiencyRating String? // A, B, C, D, E rating
+  carbonFootprintPerHour Decimal? @db.Decimal(8,4)
+  
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  // Relations
+  operator          Operator @relation(fields: [operatorId], references: [id], onDelete: Cascade)
+  flightLegs        FlightLeg[]
+  charterRequests   CharterRequest[]
+  pricingQuotes     PricingQuote[]
+  bookings          Booking[]
+  aircraftReviews   AircraftReview[]
+  maintenanceRecords MaintenanceRecord[]
+  
+  @@map("aircraft")
+}
+
+model FlightLeg {
+  id                String   @id
+  aircraftId        String
+  departureAirport  String   // ICAO code
+  arrivalAirport    String   // ICAO code
+  departureDate     DateTime @db.Date
+  departureTime     DateTime @db.Time
+  arrivalDate       DateTime @db.Date
+  arrivalTime       DateTime @db.Time
+  flightTime        Decimal  @db.Decimal(5,2) // hours
+  distance          Int      // nautical miles
+  status            FlightLegStatus @default(Available)
+  price             Decimal  @db.Decimal(10,2)
+  currency          String   @default("USD")
+  type              FlightLegType
+  
+  // Enhanced features for competition
+  dynamicPricing    Boolean  @default(false)
+  instantBooking    Boolean  @default(false)
+  specialOffers     Json?    // Special pricing or packages
+  weatherAlerts     Json?    // Weather-related information
+  
+  // AI optimization
+  demandScore       Float?   @default(0) // AI-calculated demand (0-1)
+  priceOptimized    Boolean  @default(false)
+  
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  // Relations
+  aircraft          Aircraft @relation(fields: [aircraftId], references: [id], onDelete: Cascade)
+  bookingLegs       BookingLeg[]
+  
+  @@map("flight_legs")
+}
+
+// ===================================
+// CUSTOMER INTERACTION & BOOKINGS
+// ===================================
+
+model CharterRequest {
+  id                String   @id
+  aircraftId        String
+  operatorId        String
+  departureAirport  String   // ICAO code
+  arrivalAirport    String   // ICAO code
+  departureDate     DateTime @db.Date
+  departureTime     DateTime @db.Time
+  returnDate        DateTime? @db.Date
+  returnTime        DateTime? @db.Time
+  passengers        Int
+  contactName       String
+  contactEmail      String
+  contactPhone      String
+  company           String?
+  specialRequests   String?
+  status            BookingStatus @default(Pending)
+  
+  // Enhanced customer experience
+  preferredCommunication String[] @default(["email"]) // email, sms, whatsapp, call
+  urgencyLevel      String   @default("standard") // urgent, standard, flexible
+  budgetRange       String?  // "50000-75000"
+  flexibleDates     Boolean  @default(false)
+  flexibleAirports  Boolean  @default(false)
+  
+  // AI-powered matching
+  aiMatchScore      Float?   @default(0)
+  aiRecommendations Json?    // AI-suggested alternatives
+  
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  // Relations
+  aircraft          Aircraft @relation(fields: [aircraftId], references: [id])
+  operator          Operator @relation(fields: [operatorId], references: [id])
+  pricingQuotes     PricingQuote[]
+  
+  @@map("charter_requests")
+}
+
+model PricingQuote {
+  id                String   @id
+  requestId         String?
+  aircraftId        String
+  totalPrice        Decimal  @db.Decimal(12,2)
+  currency          String   @default("USD")
+  priceBreakdown    Json     // Detailed cost breakdown
+  validUntil        DateTime
+  terms             String[]
+  cancellationPolicy String?
+  
+  // Competitive pricing features
+  competitorComparison Json? // Price comparison with other platforms
+  priceMatchGuarantee Boolean @default(false)
+  instantAcceptance Boolean  @default(false)
+  
+  // Smart contracts integration
+  smartContractAddress String?
+  blockchainVerified Boolean @default(false)
+  escrowEnabled     Boolean  @default(false)
+  
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  // Relations
+  charterRequest    CharterRequest? @relation(fields: [requestId], references: [id])
+  aircraft          Aircraft @relation(fields: [aircraftId], references: [id])
+  bookings          Booking[]
+  
+  @@map("pricing_quotes")
+}
+
+model Booking {
+  id                String   @id
+  quoteId           String?
+  aircraftId        String
+  operatorId        String
+  status            BookingStatus @default(Pending)
+  
+  // Financial details
+  totalPrice        Decimal  @db.Decimal(12,2)
+  currency          String   @default("USD")
+  paymentStatus     PaymentStatus @default(Pending)
+  paymentMethod     String?
+  depositAmount     Decimal  @db.Decimal(12,2) @default(0)
+  balanceAmount     Decimal  @db.Decimal(12,2) @default(0)
+  depositDueDate    DateTime?
+  balanceDueDate    DateTime?
+  
+  // Enhanced booking features
+  confirmationCode  String   @unique // 6-character code
+  qrCode            String?  // QR code for mobile check-in
+  digitalWallet     Boolean  @default(false)
+  
+  // Real-time updates
+  realTimeUpdates   Boolean  @default(true)
+  updatePreferences Json?    // SMS, email, push notification settings
+  
+  // Customer experience
+  passengerInfo     Json     // Passenger contact details
+  specialRequests   String?
+  dietaryRestrictions Json?
+  accessibilityNeeds Json?
+  
+  // Insurance and protection
+  travelInsurance   Boolean  @default(false)
+  cancelProtection  Boolean  @default(false)
+  weatherProtection Boolean  @default(false)
+  
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  // Relations
+  quote             PricingQuote? @relation(fields: [quoteId], references: [id])
+  aircraft          Aircraft @relation(fields: [aircraftId], references: [id])
+  operator          Operator @relation(fields: [operatorId], references: [id])
+  bookingLegs       BookingLeg[]
+  transactions      Transaction[]
+  
+  @@map("bookings")
+}
+
+model BookingLeg {
+  bookingId         String
+  flightLegId       String
+  legOrder          Int
+  
+  // Enhanced leg details
+  passengerCount    Int      @default(0)
+  cateringService   String?  // None, Light, Full
+  groundTransport   String?  // None, Sedan, SUV, Helicopter
+  
+  booking           Booking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  flightLeg         FlightLeg @relation(fields: [flightLegId], references: [id], onDelete: Cascade)
+  
+  @@id([bookingId, flightLegId])
+  @@map("booking_legs")
+}
+
+// ===================================
+// CUSTOMER FEEDBACK & RATINGS
+// ===================================
+
+model OperatorReview {
+  id                String   @id
+  operatorId        String
+  bookingId         String?  // Optional link to booking
+  customerName      String
+  customerEmail     String
+  rating            Int      // 1-5 stars
+  title             String?
+  review            String?
+  
+  // Detailed ratings
+  serviceRating     Int      // 1-5
+  communicationRating Int    // 1-5
+  valueRating       Int      // 1-5
+  timelinessRating  Int      // 1-5
+  
+  // Verification
+  verifiedBooking   Boolean  @default(false)
+  helpful           Int      @default(0) // Helpful votes
+  
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  // Relations
+  operator          Operator @relation(fields: [operatorId], references: [id])
+  
+  @@map("operator_reviews")
+}
+
+model AircraftReview {
+  id                String   @id
+  aircraftId        String
+  bookingId         String?  // Optional link to booking
+  customerName      String
+  customerEmail     String
+  rating            Int      // 1-5 stars
+  title             String?
+  review            String?
+  
+  // Detailed ratings
+  comfortRating     Int      // 1-5
+  cleanlinessRating Int      // 1-5
+  amenitiesRating   Int      // 1-5
+  
+  verifiedBooking   Boolean  @default(false)
+  helpful           Int      @default(0)
+  
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  // Relations
+  aircraft          Aircraft @relation(fields: [aircraftId], references: [id])
+  
+  @@map("aircraft_reviews")
+}
+
+// ===================================
+// MAINTENANCE & OPERATIONS
+// ===================================
+
+model MaintenanceRecord {
+  id                String   @id
+  aircraftId        String
+  maintenanceType   String   // Routine, Progressive, AOG, Compliance
+  description       String
+  scheduledDate     DateTime
+  completedDate     DateTime?
+  cost              Decimal? @db.Decimal(12,2)
+  currency          String   @default("USD")
+  facility          String?
+  technician        String?
+  workOrders        String[]
+  
+  // Predictive maintenance
+  hoursAtMaintenance Decimal? @db.Decimal(10,2)
+  cyclesAtMaintenance Int?
+  predictionAccuracy Float?   // How accurate was the prediction (0-1)
+  
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  // Relations
+  aircraft          Aircraft @relation(fields: [aircraftId], references: [id])
+  
+  @@map("maintenance_records")
+}
+
+// ===================================
+// FINANCIAL TRANSACTIONS
+// ===================================
+
+model Transaction {
+  id                String   @id
+  bookingId         String?
+  transactionType   String   // Payment, Refund, Chargeback, Fee
+  amount            Decimal  @db.Decimal(12,2)
+  currency          String   @default("USD")
+  status            String   // Pending, Completed, Failed, Cancelled
+  
+  // Payment details
+  paymentMethod     String?  // CreditCard, BankTransfer, Crypto, etc.
+  processorName     String?  // Stripe, Square, etc.
+  processorTransactionId String?
+  processorFee      Decimal? @db.Decimal(10,2)
+  
+  // Blockchain integration
+  blockchainTxHash  String?  // Transaction hash for crypto payments
+  smartContractAddress String?
+  gasUsed           String?
+  
+  // Risk management
+  riskScore         Int?     // 0-100
+  fraudFlags        String[]
+  
+  description       String
+  customerReference String?
+  merchantReference String?
+  
+  // Timestamps
+  initiatedDate     DateTime @default(now())
+  completedDate     DateTime?
+  
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  // Relations
+  booking           Booking? @relation(fields: [bookingId], references: [id])
+  
+  @@map("transactions")
+}
+
+// ===================================
+// ANALYTICS & REPORTING
+// ===================================
+
+model MarketAnalytics {
+  id                String   @id
+  date              DateTime @db.Date
+  region            String   // North America, Europe, etc.
+  
+  // Market metrics
+  totalBookings     Int      @default(0)
+  totalRevenue      Decimal  @db.Decimal(15,2) @default(0)
+  averagePrice      Decimal  @db.Decimal(10,2) @default(0)
+  utilizationRate   Float    @default(0) // 0-1
+  
+  // Popular routes
+  topRoutes         Json     // Array of {from, to, count}
+  topAircraft       Json     // Array of {category, count}
+  
+  // Competitive intelligence
+  marketShare       Float?   @default(0) // Our platform's market share
+  competitorPricing Json?    // Average competitor pricing
+  
+  createdAt         DateTime @default(now())
+  
+  @@unique([date, region])
+  @@map("market_analytics")
+}
+
+model UserBehaviorAnalytics {
+  id                String   @id
+  sessionId         String
+  userId            String?  // If logged in
+  
+  // User journey
+  entryPoint        String   // Search, Direct, Referral
+  searchCriteria    Json?    // Search parameters used
+  viewedAircraft    String[] // Aircraft IDs viewed
+  quotesRequested   Int      @default(0)
+  bookingCompleted  Boolean  @default(false)
+  
+  // Engagement metrics
+  sessionDuration   Int      // seconds
+  pageViews         Int      @default(1)
+  bounceRate        Boolean  @default(true)
+  
+  // Device and location
+  userAgent         String
+  ipAddress         String
+  country           String?
+  city              String?
+  
+  createdAt         DateTime @default(now())
+  
+  @@map("user_behavior_analytics")
+}
+
+// ===================================
+// AI/ML MODELS & PREDICTIONS
+// ===================================
+
+model PricePrediction {
+  id                String   @id
+  aircraftId        String
+  route             String   // "KJFK-KLAX"
+  predictedDate     DateTime
+  
+  // Predictions
+  predictedPrice    Decimal  @db.Decimal(10,2)
+  confidenceScore   Float    // 0-1
+  demandForecast    Float    // 0-1 (low to high demand)
+  
+  // Factors considered
+  historicalPricing Json     // Historical price data
+  seasonalFactors   Json     // Holiday, summer, winter effects
+  weatherFactors    Json     // Weather impact predictions
+  eventFactors      Json     // Local events affecting demand
+  
+  // Model info
+  modelVersion      String   @default("1.0")
+  trainingAccuracy  Float?
+  
+  createdAt         DateTime @default(now())
+  
+  @@map("price_predictions")
+}
+
+model DemandForecast {
+  id                String   @id
+  route             String   // "KJFK-KLAX"
+  forecastDate      DateTime
+  
+  // Demand predictions
+  expectedBookings  Int      // Predicted number of bookings
+  demandIntensity   Float    // 0-1 scale
+  peakHours         Int[]    // Hours of day with peak demand
+  
+  // Contributing factors
+  seasonality       Float    // Seasonal demand factor
+  events            Json?    // Local events driving demand
+  economicIndicators Json?   // Economic factors
+  
+  // Accuracy tracking
+  actualBookings    Int?     // Filled after the date passes
+  predictionAccuracy Float?  // Calculated accuracy score
+  
+  createdAt         DateTime @default(now())
+  
+  @@map("demand_forecasts")
+}
+
+// ===================================
+// REAL-TIME FEATURES
+// ===================================
+
+model RealTimeAlert {
+  id                String   @id
+  alertType         String   // WeatherDelay, MaintenanceIssue, PriceChange
+  severity          String   // Low, Medium, High, Critical
+  title             String
+  message           String
+  
+  // Targeting
+  affectedUsers     String[] // User IDs or "all"
+  affectedBookings  String[] // Booking IDs
+  affectedAircraft  String[] // Aircraft IDs
+  affectedRoutes    String[] // Route codes
+  
+  // Status
+  isActive          Boolean  @default(true)
+  resolvedAt        DateTime?
+  
+  // Delivery tracking
+  sentViaEmail      Boolean  @default(false)
+  sentViaSMS        Boolean  @default(false)
+  sentViaPush       Boolean  @default(false)
+  
+  createdAt         DateTime @default(now())
+  
+  @@map("real_time_alerts")
+}
+
+model NotificationPreference {
+  id                String   @id
+  userId            String   @unique // User identifier
+  
+  // Communication preferences
+  emailEnabled      Boolean  @default(true)
+  smsEnabled        Boolean  @default(false)
+  pushEnabled       Boolean  @default(true)
+  whatsappEnabled   Boolean  @default(false)
+  
+  // Notification types
+  bookingUpdates    Boolean  @default(true)
+  priceAlerts       Boolean  @default(true)
+  weatherAlerts     Boolean  @default(true)
+  promotions        Boolean  @default(false)
+  
+  // Contact info
+  email             String?
+  phone             String?
+  whatsappNumber    String?
+  
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  @@map("notification_preferences")
+}
+
+// ===================================
+// ENUMS
+// ===================================
+
+enum AvailabilityStatus {
+  Available
+  OnRequest
+  Unavailable
+}
+
+enum FlightLegStatus {
+  Available
+  Booked
+  InProgress
+  Completed
+}
+
+enum FlightLegType {
+  EmptyLeg
+  Charter
+  Positioning
+}
+
+enum BookingStatus {
+  Pending
+  Confirmed
+  InProgress
+  Completed
+  Cancelled
+}
+
+enum PaymentStatus {
+  Pending
+  DepositPaid
+  FullyPaid
+  Refunded
+}

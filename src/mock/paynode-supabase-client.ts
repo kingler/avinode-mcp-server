@@ -597,7 +597,7 @@ export class PaynodeSupabaseMockClient {
       const refundReference = generateRefundReference();
       const processorFee = calculateProcessorFee(request.refundAmount, originalTransaction.processor_name);
 
-      const newRefund = {
+      const newRefund: any = {
         id: `REF${Math.random().toString(36).substr(2, 9)}`.toUpperCase(),
         refund_reference: refundReference,
         original_transaction_id: request.transactionId,

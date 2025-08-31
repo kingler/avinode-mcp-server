@@ -1,14 +1,16 @@
 import { CallToolRequest } from "@modelcontextprotocol/sdk/types.js";
 import { AvinodeMockClient } from "./mock/avinode-mock-client";
-import { formatCurrency } from "./mock/avinode-mock-data";
+import { formatCurrency, MOCK_OPERATORS, MOCK_AIRCRAFT } from "./mock/avinode-mock-data";
 
 export class AvainodeTools {
   private mockClient: AvinodeMockClient;
   private useMockData: boolean;
 
-  constructor() {
-    const apiKey = process.env.AVAINODE_API_KEY || "";
-    this.useMockData = !apiKey || process.env.USE_MOCK_DATA === "true";
+  constructor(apiKey?: string, forceMockData?: boolean) {
+    // Use provided apiKey or fallback to environment variable (if in Node.js)
+    const effectiveApiKey = apiKey || (typeof process !== 'undefined' ? process.env.AVAINODE_API_KEY : "") || "";
+    // Use mock data if explicitly forced, no API key, or USE_MOCK_DATA env is true
+    this.useMockData = forceMockData || !effectiveApiKey || (typeof process !== 'undefined' && process.env.USE_MOCK_DATA === "true");
     
     if (this.useMockData) {
       console.log("Using Avinode mock data (set AVAINODE_API_KEY to use real API)");
@@ -687,9 +689,8 @@ ${JSON.stringify(modifications, null, 2)}
     }
 
     try {
-      // For now, use mock data
-      const mockOperators = await import("./mock/avinode-mock-data");
-      const operator = mockOperators.MOCK_OPERATORS.find(op => op.id === operatorId);
+      // Use imported mock data
+      const operator = MOCK_OPERATORS.find((op: any) => op.id === operatorId);
 
       if (!operator) {
         return {
@@ -702,7 +703,7 @@ ${JSON.stringify(modifications, null, 2)}
         };
       }
 
-      const operatorAircraft = mockOperators.MOCK_AIRCRAFT.filter(a => a.operatorId === operatorId);
+      const operatorAircraft = MOCK_AIRCRAFT.filter((a: any) => a.operatorId === operatorId);
 
       let response = `# Operator Information
 
@@ -742,7 +743,7 @@ ${operator.description}`;
       }
 
       if (includeFleetDetails && operatorAircraft.length > 0) {
-        const fleetByCategory = operatorAircraft.reduce((acc, aircraft) => {
+        const fleetByCategory = operatorAircraft.reduce((acc: any, aircraft: any) => {
           if (!acc[aircraft.category]) {
             acc[aircraft.category] = [];
           }
@@ -753,15 +754,15 @@ ${operator.description}`;
         response += `
 
 ### Fleet Composition
-${Object.entries(fleetByCategory).map(([category, aircraft]) => 
+${Object.entries(fleetByCategory).map(([category, aircraft]: [string, any]) => 
   `- **${category}:** ${aircraft.length} aircraft
-  ${aircraft.map(a => `  • ${a.model} (${a.registrationNumber})`).join('\n')}`
+  ${aircraft.map((a: any) => `  • ${a.model} (${a.registrationNumber})`).join('\n')}`
 ).join('\n')}
 
 ### Fleet Statistics
-- **Average Age:** ${(operatorAircraft.reduce((sum, a) => sum + (2024 - a.yearOfManufacture), 0) / operatorAircraft.length).toFixed(1)} years
-- **Total Passenger Capacity:** ${operatorAircraft.reduce((sum, a) => sum + a.maxPassengers, 0)} seats
-- **WiFi Equipped:** ${operatorAircraft.filter(a => a.wifiAvailable).length}/${operatorAircraft.length} aircraft`;
+- **Average Age:** ${(operatorAircraft.reduce((sum: number, a: any) => sum + (2024 - a.yearOfManufacture), 0) / operatorAircraft.length).toFixed(1)} years
+- **Total Passenger Capacity:** ${operatorAircraft.reduce((sum: number, a: any) => sum + a.maxPassengers, 0)} seats
+- **WiFi Equipped:** ${operatorAircraft.filter((a: any) => a.wifiAvailable).length}/${operatorAircraft.length} aircraft`;
       }
 
       response += `

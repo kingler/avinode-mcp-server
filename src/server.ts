@@ -99,7 +99,7 @@ export class MCPServer {
       console.error("Error handling MCP request:", error);
       
       // Provide helpful error message for common MCP issues
-      if (error.message && error.message.includes('accept')) {
+      if (error instanceof Error && error.message && error.message.includes('accept')) {
         res.status(406).json(this.createErrorResponse(
           "MCP Protocol requires Accept header: 'application/json, text/event-stream'. " +
           "For N8N workflows, use REST endpoints: GET /api/tools, POST /api/operational-data"
