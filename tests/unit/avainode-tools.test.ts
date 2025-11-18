@@ -134,8 +134,8 @@ describe('Avainode MCP Tools', () => {
       
       expect(result).toHaveProperty('content');
       expect(result.content[0].text).toContain('Charter Flight Quote');
-      expect(result.content[0].text).toContain('Total cost');
-      expect(result.content[0].text).toContain('Flight time');
+      expect(result.content[0].text).toContain('Total Price');
+      expect(result.content[0].text).toContain('Flight Hours');
     });
 
     test('handles one-way pricing', async () => {
@@ -162,57 +162,132 @@ describe('Avainode MCP Tools', () => {
 
   describe('manage-booking tool', () => {
     test('updates booking status', async () => {
-      const request: CallToolRequest = {
+      // First create a booking
+      const createRequest: CallToolRequest = {
+        method: 'tools/call',
+        params: {
+          name: 'create-charter-request',
+          arguments: {
+            aircraftId: 'ACF001',
+            departureAirport: 'KJFK',
+            arrivalAirport: 'KLAX',
+            departureDate: '2024-03-15',
+            departureTime: '10:00',
+            passengers: 8,
+            contactName: 'John Doe',
+            contactEmail: 'john@jetvision.com',
+            contactPhone: '+1-555-0123'
+          }
+        }
+      };
+
+      const createResult = await avainodeTools.handleToolCall(createRequest);
+      const bookingIdMatch = createResult.content[0].text.match(/Booking ID:\*\* ([A-Z0-9]+)/);
+      expect(bookingIdMatch).toBeTruthy();
+      const bookingId = bookingIdMatch![1];
+
+      // Now confirm the booking
+      const confirmRequest: CallToolRequest = {
         method: 'tools/call',
         params: {
           name: 'manage-booking',
           arguments: {
-            bookingId: 'BK12345678',
+            bookingId,
             action: 'confirm',
             paymentMethod: 'wire_transfer'
           }
         }
       };
 
-      const result = await avainodeTools.handleToolCall(request);
-      
+      const result = await avainodeTools.handleToolCall(confirmRequest);
+
       expect(result).toHaveProperty('content');
       expect(result.content[0].text).toContain('Booking Confirmed');
     });
 
     test('handles booking cancellation', async () => {
-      const request: CallToolRequest = {
+      // First create a booking
+      const createRequest: CallToolRequest = {
+        method: 'tools/call',
+        params: {
+          name: 'create-charter-request',
+          arguments: {
+            aircraftId: 'ACF001',
+            departureAirport: 'KJFK',
+            arrivalAirport: 'KLAX',
+            departureDate: '2024-03-15',
+            departureTime: '10:00',
+            passengers: 8,
+            contactName: 'John Doe',
+            contactEmail: 'john@jetvision.com',
+            contactPhone: '+1-555-0123'
+          }
+        }
+      };
+
+      const createResult = await avainodeTools.handleToolCall(createRequest);
+      const bookingIdMatch = createResult.content[0].text.match(/Booking ID:\*\* ([A-Z0-9]+)/);
+      expect(bookingIdMatch).toBeTruthy();
+      const bookingId = bookingIdMatch![1];
+
+      // Now cancel the booking
+      const cancelRequest: CallToolRequest = {
         method: 'tools/call',
         params: {
           name: 'manage-booking',
           arguments: {
-            bookingId: 'BK12345678',
+            bookingId,
             action: 'cancel',
             cancellationReason: 'Client request'
           }
         }
       };
 
-      const result = await avainodeTools.handleToolCall(request);
-      
+      const result = await avainodeTools.handleToolCall(cancelRequest);
+
       expect(result).toHaveProperty('content');
       expect(result.content[0].text).toContain('Booking Cancelled');
     });
 
     test('retrieves booking details', async () => {
-      const request: CallToolRequest = {
+      // First create a booking
+      const createRequest: CallToolRequest = {
+        method: 'tools/call',
+        params: {
+          name: 'create-charter-request',
+          arguments: {
+            aircraftId: 'ACF001',
+            departureAirport: 'KJFK',
+            arrivalAirport: 'KLAX',
+            departureDate: '2024-03-15',
+            departureTime: '10:00',
+            passengers: 8,
+            contactName: 'John Doe',
+            contactEmail: 'john@jetvision.com',
+            contactPhone: '+1-555-0123'
+          }
+        }
+      };
+
+      const createResult = await avainodeTools.handleToolCall(createRequest);
+      const bookingIdMatch = createResult.content[0].text.match(/Booking ID:\*\* ([A-Z0-9]+)/);
+      expect(bookingIdMatch).toBeTruthy();
+      const bookingId = bookingIdMatch![1];
+
+      // Now get booking details
+      const detailsRequest: CallToolRequest = {
         method: 'tools/call',
         params: {
           name: 'manage-booking',
           arguments: {
-            bookingId: 'BK12345678',
+            bookingId,
             action: 'get_details'
           }
         }
       };
 
-      const result = await avainodeTools.handleToolCall(request);
-      
+      const result = await avainodeTools.handleToolCall(detailsRequest);
+
       expect(result).toHaveProperty('content');
       expect(result.content[0].text).toContain('Booking Details');
     });
